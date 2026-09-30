@@ -1,11 +1,176 @@
-<div align="center">
+# 🛡️ Security Advisory Tracker & Outbreak Response Center
 
-<img width="1200" height="475" alt="GHBanner" src="https://github.com/user-attachments/assets/0aa67016-6eaf-458a-adb2-6e31a0763ed6" />
+A high-fidelity, production-ready full-stack Security Dashboard for CMDB systems. This system manages your local software inventory, correlates matches against live environments, tracks active CVE threats, and introduces a **State-of-the-Art Zero-Day Threat Outbreak Control Panel** with **Autonomous AI Patching Agent** simulation and live scrolling CLI consoles.
 
-  <h1>Built with AI Studio</h2>
+---
 
-  <p>The fastest path from prompt to production with Gemini.</p>
+## 🔥 Featured: Zero-Day Threat & Outbreak Management
+This release introduces advanced capabilities designed to handle high-profile zero-day exploits (e.g., Log4Shell, Heartbleed-NG) that have active exploits circulating in the wild before vendor patches are available.
+* **Outbreak Highlighting Banner**: A glowing, high-contrast alert panel pinning active zero-days at the very top of the analyst dashboard.
+* **Technical Workaround Playbooks**: Actionable CLI scripts for both Linux/Docker and Windows/PowerShell environments to contain threats immediately.
+* **Autonomous Virtual Patching**: An interactive, one-click **AI Patching Agent** that logs remote terminal operations (package updates, module disabling, and configuration validation) inside a simulated scrolling console, successfully mitigating the threat in real-time.
 
-  <a href="https://aistudio.google.com/apps">Start building</a>
+---
 
-</div>
+## 🏗️ System Topology & Services
+
+The application consists of five Docker services defined in `docker-compose.yml`:
+
+| Service | Container Name | Role | Port |
+| :--- | :--- | :--- | :--- |
+| **postgres** | `cve-tracker-db` | Relational PostgreSQL 16 database | `5432` |
+| **bootstrap** | `cve-tracker-bootstrap` | One-shot job syncing inventory files from the `inventory/` directory | - |
+| **backend** | `cve-tracker-api` | Python FastAPI REST & WebSocket server | `8000` |
+| **worker** | `cve-tracker-worker` | Python background worker syncing NVD CVEs every 24 hours | - |
+| **frontend** | `cve-tracker-ui` | React + TypeScript + Tailwind single page application served by nginx | `5173` |
+
+---
+
+## ⚙️ Languages, LLM & Model Context Protocol (MCP) Configuration
+
+This system utilizes a modern full-stack architecture designed for extreme performance, security, and smart capabilities. Below is the technical breakdown of the languages, Large Language Models (LLMs), and Model Context Protocol (MCP) details.
+
+### 1. Languages & Frameworks Used
+* **Frontend**: **TypeScript (React 18)** built with **Vite** and styled using **Tailwind CSS**. 
+  * Rich micro-animations are driven by `motion/react` (Framer Motion).
+  * Data visualization and graphs utilize `recharts`.
+  * Standardized typography is set with the clean `Inter` and `JetBrains Mono` fonts.
+* **Backend (Active Environment)**: **TypeScript & Node.js (Express)**.
+  * In the developer workspace and production deployment, a high-fidelity unified Express server (`server.ts`) handles REST APIs and live WebSockets.
+  * The TypeScript backend is bundled using `esbuild` into a single, high-performance CommonJS file (`dist/server.cjs`) to minimize startup times and filesystem I/O.
+* **Supplementary/Alternative Backend**: **Python 3**.
+  * A full FastAPI suite is maintained in `/backend` with `SQLAlchemy`, `pandas`, and `openpyxl` for optional database setups and supplementary spreadsheet ingestion scripts.
+
+### 2. Large Language Model (LLM) Integration
+The advisory panel features deep, contextual intelligence powered by generative AI:
+* **LLM Engine**: **Google Gemini** (interacting via the official `@google/genai` SDK on the server-side).
+* **Primary Features**: Generates smart contextual advisories, risk scoring, tailored container/firewall remediation playbooks, and OS workaround guides dynamically based on exact package configurations.
+* **Configuration**:
+  * Set the `GEMINI_API_KEY` environment variable in your server environment or platform secrets.
+  * *Graceful Fallback*: If the API key is not supplied, the system seamlessly triggers standard local rules-based security advisories to ensure continuous operation.
+
+### 3. Model Context Protocol (MCP)
+* **Status**: This application currently operates over high-fidelity custom REST APIs and WebSockets. There is **no dedicated MCP server** pre-bundled in the codebase.
+* **How to Integrate MCP**:
+  If you wish to control, inspect, or fetch inventory state directly from an AI Assistant (like Claude Desktop or Gemini Code Assist), you can easily wrap this application's API endpoints using the official Model Context Protocol.
+  
+  To set up an MCP server bridge:
+  1. Install the MCP SDK: `npm install @modelcontextprotocol/sdk`
+  2. Map these existing endpoints to MCP Tools:
+     * `get_inventory_status` -> Queries `/api/v1/inventory`
+     * `list_vulnerabilities` -> Queries `/api/v1/vulnerabilities`
+     * `get_patch_advisory` -> Queries `/api/v1/vulnerabilities/:id/ai-advisory`
+  3. register the bridge inside your `claude_desktop_config.json` or equivalent agent tool integration!
+
+---
+
+Follow these steps to build, run, and test the system locally using Docker Desktop:
+
+### Prerequisites
+* **Docker Desktop** installed and running on Windows, macOS, or Linux.
+* **Git** (optional) to clone the repository.
+
+### 1. Build and Launch Services
+Spin up the complete full-stack environment in detached mode:
+```bash
+docker compose up -d --build
+```
+*Docker will pull base images, install Python/Node dependencies, compile the React production bundles, and set up local networking.*
+
+### 2. Seed Default Administrator Credentials
+Seed the Postgres database with default user accounts and a secure, cryptographically random password:
+```bash
+docker compose exec backend python scripts/seed_admin.py
+```
+*Note: Make sure to copy the generated admin password printed to the terminal!*
+
+### 3. Access the Dashboard
+Open your web browser and go to:
+* **UI Portal**: `http://localhost:5173`
+* **API Swagger Docs**: `http://localhost:8000/docs`
+
+Log in using `admin` and the generated password from step 2. You can trigger scans, manage inventory files, assign engineers, and deploy the AI Patching Agent live!
+
+### Setup Teardown
+To stop all containers while preserving database volume records:
+```bash
+docker compose down
+```
+To stop containers and completely wipe all Postgres data (starting fresh):
+```bash
+docker compose down -v
+```
+
+---
+
+## ☁️ Deploying to Public Cloud Environments
+
+Ready to move from local development to production? Here is how to migrate this containerized full-stack architecture to AWS and Azure:
+
+### 1. Deploying to AWS (Amazon Web Services)
+
+The fastest and most robust way to deploy this on AWS is using **Amazon ECS (Elastic Container Service) on AWS Fargate** (Serverless Containers) with an **Amazon RDS PostgreSQL** database:
+
+#### Step A: Database Setup
+1. Spin up an **Amazon RDS for PostgreSQL** database instance in your private subnet.
+2. Note down the Database Host connection string, DB User, and password.
+
+#### Step B: Build and Push Images to Amazon ECR (Elastic Container Registry)
+Create ECR repositories for the backend, frontend, and worker images:
+```bash
+# Authenticate Docker to your AWS Account
+aws ecr get-login-password --region <region> | docker login --username AWS --password-stdin <aws_account_id>.dkr.ecr.<region>.amazonaws.com
+
+# Build and Tag your images
+docker build -t cve-tracker-backend ./backend
+docker tag cve-tracker-backend:latest <aws_account_id>.dkr.ecr.<region>.amazonaws.com/cve-tracker-backend:latest
+docker push <aws_account_id>.dkr.ecr.<region>.amazonaws.com/cve-tracker-backend:latest
+
+docker build -t cve-tracker-frontend ./frontend
+docker tag cve-tracker-frontend:latest <aws_account_id>.dkr.ecr.<region>.amazonaws.com/cve-tracker-frontend:latest
+docker push <aws_account_id>.dkr.ecr.<region>.amazonaws.com/cve-tracker-frontend:latest
+```
+
+#### Step C: Define ECS Task Definition and Run
+1. Create a task definition specifying your backend, frontend, and worker containers.
+2. In the Backend and Worker container specifications, inject environment variables pointing to your RDS connection string:
+   * `DATABASE_URL=postgresql://<db_user>:<db_password>@<rds_endpoint>:5432/<db_name>`
+   * `JWT_SECRET=<your_secure_jwt_key>`
+3. Set up an **Application Load Balancer (ALB)** to route port `80` traffic to the frontend container, and proxy `/api/*` and `/ws/*` requests to your backend service.
+
+---
+
+### 2. Deploying to Azure (Microsoft Azure)
+
+The best serverless option on Azure is **Azure Container Apps (ACA)**, which supports multi-container communication via environment ingress and Dapr natively:
+
+#### Step A: Database Setup
+1. Deploy an **Azure Database for PostgreSQL Flexible Server**.
+2. Configure network firewall rules to allow connections from other Azure services.
+
+#### Step B: Push Images to Azure Container Registry (ACR)
+```bash
+# Login to Azure and your Registry
+az login
+az acr login --name <your_acr_name>
+
+# Tag and push images
+docker tag cve-tracker-backend:latest <your_acr_name>.azurecr.io/cve-tracker-backend:latest
+docker push <your_acr_name>.azurecr.io/cve-tracker-backend:latest
+
+docker tag cve-tracker-frontend:latest <your_acr_name>.azurecr.io/cve-tracker-frontend:latest
+docker push <your_acr_name>.azurecr.io/cve-tracker-frontend:latest
+```
+
+#### Step C: Deploy Container Apps
+1. Create an **Azure Container Apps Environment** with a virtual network.
+2. Deploy the **Backend container app**:
+   * Enable ingress (target port `8000`), restricted to internal VNet traffic or open depending on your requirements.
+   * Add environment secrets for `DATABASE_URL` pointing to your Azure Postgres.
+3. Deploy the **Frontend container app**:
+   * Enable external ingress (target port `80` / `8080`).
+   * Add env variable `BACKEND_URL` pointing to your Backend Container App internal address.
+4. Deploy the **Worker background container app** (ingress disabled).
+
+---
+

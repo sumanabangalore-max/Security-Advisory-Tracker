@@ -1,0 +1,2564 @@
+{
+  "microsoft sql server": {
+    "software_key": "microsoft sql server",
+    "aliases": [
+      "microsoft sql server",
+      "microsoft sql server 2019",
+      "microsoft sql server 2022",
+      "sql server",
+      "sql server 2019",
+      "mssql"
+    ],
+    "canonical_name": "Microsoft SQL Server 2019",
+    "source_type": "microsoft",
+    "source_url": "https://learn.microsoft.com/en-us/troubleshoot/sql/releases/sqlserver-2019/build-versions",
+    "latest_market_version": "16.0.4145.4",
+    "market_release_date": "2026-09-10",
+    "releases": [
+      {
+        "tag": "2019-CU28-GDR",
+        "version": "15.0.4465.1",
+        "published_at": "2026-09-10",
+        "url": "https://support.microsoft.com/help/5043180"
+      },
+      {
+        "tag": "2019-CU28",
+        "version": "15.0.4460.4",
+        "published_at": "2026-08-01",
+        "url": "https://support.microsoft.com/help/5042850"
+      }
+    ]
+  },
+  "istio": {
+    "software_key": "istio",
+    "aliases": [
+      "istio",
+      "istio-proxy",
+      "istiod",
+      "istio service mesh"
+    ],
+    "canonical_name": "Istio Service Mesh",
+    "source_type": "github",
+    "repo": "istio/istio",
+    "source_url": "https://istio.io/latest/news/releases/",
+    "latest_market_version": "1.31.0",
+    "market_release_date": "2026-08-31",
+    "releases": [
+      {
+        "tag": "1.31.0",
+        "version": "1.31.0",
+        "published_at": "2026-08-31",
+        "url": "https://github.com/istio/istio/releases/tag/1.31.0"
+      },
+      {
+        "tag": "1.30.4",
+        "version": "1.30.4",
+        "published_at": "2026-08-27",
+        "url": "https://github.com/istio/istio/releases/tag/1.30.4"
+      },
+      {
+        "tag": "1.30.3",
+        "version": "1.30.3",
+        "published_at": "2026-07-16",
+        "url": "https://github.com/istio/istio/releases/tag/1.30.3"
+      },
+      {
+        "tag": "1.30.2",
+        "version": "1.30.2",
+        "published_at": "2026-06-24",
+        "url": "https://github.com/istio/istio/releases/tag/1.30.2"
+      },
+      {
+        "tag": "1.30.1",
+        "version": "1.30.1",
+        "published_at": "2026-06-04",
+        "url": "https://github.com/istio/istio/releases/tag/1.30.1"
+      },
+      {
+        "tag": "1.30.0",
+        "version": "1.30.0",
+        "published_at": "2026-05-18",
+        "url": "https://github.com/istio/istio/releases/tag/1.30.0"
+      },
+      {
+        "tag": "1.29.7",
+        "version": "1.29.7",
+        "published_at": "2026-08-27",
+        "url": "https://github.com/istio/istio/releases/tag/1.29.7"
+      },
+      {
+        "tag": "1.29.6",
+        "version": "1.29.6",
+        "published_at": "2026-07-16",
+        "url": "https://github.com/istio/istio/releases/tag/1.29.6"
+      },
+      {
+        "tag": "1.29.5",
+        "version": "1.29.5",
+        "published_at": "2026-06-24",
+        "url": "https://github.com/istio/istio/releases/tag/1.29.5"
+      },
+      {
+        "tag": "1.29.4",
+        "version": "1.29.4",
+        "published_at": "2026-06-04",
+        "url": "https://github.com/istio/istio/releases/tag/1.29.4"
+      },
+      {
+        "tag": "1.29.3",
+        "version": "1.29.3",
+        "published_at": "2026-05-18",
+        "url": "https://github.com/istio/istio/releases/tag/1.29.3"
+      },
+      {
+        "tag": "1.29.2",
+        "version": "1.29.2",
+        "published_at": "2026-04-13",
+        "url": "https://github.com/istio/istio/releases/tag/1.29.2"
+      },
+      {
+        "tag": "1.29.1",
+        "version": "1.29.1",
+        "published_at": "2026-03-10",
+        "url": "https://github.com/istio/istio/releases/tag/1.29.1"
+      },
+      {
+        "tag": "1.28.10",
+        "version": "1.28.10",
+        "published_at": "2026-07-01",
+        "url": "https://github.com/istio/istio/releases/tag/1.28.10"
+      },
+      {
+        "tag": "1.28.9",
+        "version": "1.28.9",
+        "published_at": "2026-06-24",
+        "url": "https://github.com/istio/istio/releases/tag/1.28.9"
+      },
+      {
+        "tag": "1.28.8",
+        "version": "1.28.8",
+        "published_at": "2026-06-04",
+        "url": "https://github.com/istio/istio/releases/tag/1.28.8"
+      },
+      {
+        "tag": "1.28.7",
+        "version": "1.28.7",
+        "published_at": "2026-05-18",
+        "url": "https://github.com/istio/istio/releases/tag/1.28.7"
+      },
+      {
+        "tag": "1.28.6",
+        "version": "1.28.6",
+        "published_at": "2026-04-13",
+        "url": "https://github.com/istio/istio/releases/tag/1.28.6"
+      },
+      {
+        "tag": "1.27.9",
+        "version": "1.27.9",
+        "published_at": "2026-04-07",
+        "url": "https://github.com/istio/istio/releases/tag/1.27.9"
+      }
+    ],
+    "branch_patches": {
+      "1.31": {
+        "version": "1.31.0",
+        "release_date": "2026-08-31",
+        "eol": false
+      },
+      "1.30": {
+        "version": "1.30.4",
+        "release_date": "2026-08-27",
+        "eol": false
+      },
+      "1.29": {
+        "version": "1.29.7",
+        "release_date": "2026-08-27",
+        "eol": false
+      },
+      "1.28": {
+        "version": "1.28.10",
+        "release_date": "2026-07-01",
+        "eol": true
+      },
+      "1.27": {
+        "version": "1.27.9",
+        "release_date": "2026-03-30",
+        "eol": true
+      },
+      "1.26": {
+        "version": "1.26.8",
+        "release_date": "2025-12-18",
+        "eol": true
+      },
+      "1.25": {
+        "version": "1.25.6",
+        "release_date": "2025-09-22",
+        "eol": true
+      },
+      "1.24": {
+        "version": "1.24.6",
+        "release_date": "2025-06-19",
+        "eol": true
+      },
+      "1.23": {
+        "version": "1.23.6",
+        "release_date": "2025-04-07",
+        "eol": true
+      },
+      "1.22": {
+        "version": "1.22.6",
+        "release_date": "2024-12-18",
+        "eol": true
+      }
+    },
+    "last_checked": "2026-09-14T10:00:26.379Z"
+  },
+  "cert-manager": {
+    "software_key": "cert-manager",
+    "aliases": [
+      "cert-manager",
+      "certmanager",
+      "jetstack/cert-manager"
+    ],
+    "canonical_name": "Cert-Manager",
+    "source_type": "github",
+    "repo": "cert-manager/cert-manager",
+    "source_url": "https://cert-manager.io/docs/releases/",
+    "latest_market_version": "1.21.2",
+    "market_release_date": "2026-09-11",
+    "releases": [
+      {
+        "tag": "v1.21.2",
+        "version": "1.21.2",
+        "published_at": "2026-09-11",
+        "url": "https://github.com/cert-manager/cert-manager/releases/tag/v1.21.2"
+      },
+      {
+        "tag": "v1.21.1",
+        "version": "1.21.1",
+        "published_at": "2026-07-29",
+        "url": "https://github.com/cert-manager/cert-manager/releases/tag/v1.21.1"
+      },
+      {
+        "tag": "v1.21.0",
+        "version": "1.21.0",
+        "published_at": "2026-07-08",
+        "url": "https://github.com/cert-manager/cert-manager/releases/tag/v1.21.0"
+      },
+      {
+        "tag": "v1.20.3",
+        "version": "1.20.3",
+        "published_at": "2026-06-25",
+        "url": "https://github.com/cert-manager/cert-manager/releases/tag/v1.20.3"
+      },
+      {
+        "tag": "v1.20.2",
+        "version": "1.20.2",
+        "published_at": "2026-04-11",
+        "url": "https://github.com/cert-manager/cert-manager/releases/tag/v1.20.2"
+      },
+      {
+        "tag": "v1.20.1",
+        "version": "1.20.1",
+        "published_at": "2026-03-27",
+        "url": "https://github.com/cert-manager/cert-manager/releases/tag/v1.20.1"
+      },
+      {
+        "tag": "v1.20.0",
+        "version": "1.20.0",
+        "published_at": "2026-03-10",
+        "url": "https://github.com/cert-manager/cert-manager/releases/tag/v1.20.0"
+      },
+      {
+        "tag": "v1.19.6",
+        "version": "1.19.6",
+        "published_at": "2026-06-25",
+        "url": "https://github.com/cert-manager/cert-manager/releases/tag/v1.19.6"
+      },
+      {
+        "tag": "v1.19.5",
+        "version": "1.19.5",
+        "published_at": "2026-04-21",
+        "url": "https://github.com/cert-manager/cert-manager/releases/tag/v1.19.5"
+      },
+      {
+        "tag": "v1.19.4",
+        "version": "1.19.4",
+        "published_at": "2026-02-24",
+        "url": "https://github.com/cert-manager/cert-manager/releases/tag/v1.19.4"
+      },
+      {
+        "tag": "v1.19.3",
+        "version": "1.19.3",
+        "published_at": "2026-02-02",
+        "url": "https://github.com/cert-manager/cert-manager/releases/tag/v1.19.3"
+      },
+      {
+        "tag": "v1.19.2",
+        "version": "1.19.2",
+        "published_at": "2025-12-09",
+        "url": "https://github.com/cert-manager/cert-manager/releases/tag/v1.19.2"
+      },
+      {
+        "tag": "v1.19.1",
+        "version": "1.19.1",
+        "published_at": "2025-10-15",
+        "url": "https://github.com/cert-manager/cert-manager/releases/tag/v1.19.1"
+      },
+      {
+        "tag": "v1.19.0",
+        "version": "1.19.0",
+        "published_at": "2025-10-07",
+        "url": "https://github.com/cert-manager/cert-manager/releases/tag/v1.19.0"
+      },
+      {
+        "tag": "v1.18.6",
+        "version": "1.18.6",
+        "published_at": "2026-02-24",
+        "url": "https://github.com/cert-manager/cert-manager/releases/tag/v1.18.6"
+      },
+      {
+        "tag": "v1.18.5",
+        "version": "1.18.5",
+        "published_at": "2026-02-02",
+        "url": "https://github.com/cert-manager/cert-manager/releases/tag/v1.18.5"
+      },
+      {
+        "tag": "v1.18.4",
+        "version": "1.18.4",
+        "published_at": "2025-12-09",
+        "url": "https://github.com/cert-manager/cert-manager/releases/tag/v1.18.4"
+      },
+      {
+        "tag": "v1.18.3",
+        "version": "1.18.3",
+        "published_at": "2025-10-15",
+        "url": "https://github.com/cert-manager/cert-manager/releases/tag/v1.18.3"
+      },
+      {
+        "tag": "v1.18.2",
+        "version": "1.18.2",
+        "published_at": "2025-07-02",
+        "url": "https://github.com/cert-manager/cert-manager/releases/tag/v1.18.2"
+      },
+      {
+        "tag": "v1.18.1",
+        "version": "1.18.1",
+        "published_at": "2025-06-18",
+        "url": "https://github.com/cert-manager/cert-manager/releases/tag/v1.18.1"
+      },
+      {
+        "tag": "v1.18.0",
+        "version": "1.18.0",
+        "published_at": "2025-06-10",
+        "url": "https://github.com/cert-manager/cert-manager/releases/tag/v1.18.0"
+      },
+      {
+        "tag": "v1.17.4",
+        "version": "1.17.4",
+        "published_at": "2025-07-02",
+        "url": "https://github.com/cert-manager/cert-manager/releases/tag/v1.17.4"
+      },
+      {
+        "tag": "v1.17.3",
+        "version": "1.17.3",
+        "published_at": "2025-06-17",
+        "url": "https://github.com/cert-manager/cert-manager/releases/tag/v1.17.3"
+      }
+    ],
+    "branch_patches": {
+      "1.21": {
+        "version": "1.21.2",
+        "release_date": "2026-09-11",
+        "eol": false
+      },
+      "1.20": {
+        "version": "1.20.3",
+        "release_date": "2026-08-15",
+        "eol": false
+      },
+      "1.19": {
+        "version": "1.19.6",
+        "release_date": "2026-07-10",
+        "eol": false
+      },
+      "1.18": {
+        "version": "1.18.6",
+        "release_date": "2026-02-24",
+        "eol": false
+      },
+      "1.17": {
+        "version": "1.17.4",
+        "release_date": "2025-07-02",
+        "eol": true
+      },
+      "1.16": {
+        "version": "1.16.4",
+        "release_date": "2025-01-20",
+        "eol": true
+      },
+      "1.15": {
+        "version": "1.15.4",
+        "release_date": "2024-10-15",
+        "eol": true
+      },
+      "1.14": {
+        "version": "1.14.7",
+        "release_date": "2024-06-10",
+        "eol": true
+      }
+    },
+    "last_checked": "2026-09-14T10:00:26.185Z"
+  },
+  "flux": {
+    "software_key": "flux",
+    "aliases": [
+      "flux",
+      "fluxcd",
+      "flux2",
+      "source-controller",
+      "kustomize-controller",
+      "helm-controller",
+      "notification-controller"
+    ],
+    "canonical_name": "Flux GitOps CD",
+    "source_type": "github",
+    "repo": "fluxcd/flux2",
+    "source_url": "https://github.com/fluxcd/flux2/releases",
+    "latest_market_version": "2.9.5",
+    "market_release_date": "2026-08-31",
+    "releases": [
+      {
+        "tag": "v2.9.5",
+        "version": "2.9.5",
+        "published_at": "2026-08-31",
+        "url": "https://github.com/fluxcd/flux2/releases/tag/v2.9.5"
+      },
+      {
+        "tag": "v2.9.4",
+        "version": "2.9.4",
+        "published_at": "2026-08-07",
+        "url": "https://github.com/fluxcd/flux2/releases/tag/v2.9.4"
+      },
+      {
+        "tag": "v2.9.3",
+        "version": "2.9.3",
+        "published_at": "2026-07-23",
+        "url": "https://github.com/fluxcd/flux2/releases/tag/v2.9.3"
+      },
+      {
+        "tag": "v2.9.2",
+        "version": "2.9.2",
+        "published_at": "2026-07-13",
+        "url": "https://github.com/fluxcd/flux2/releases/tag/v2.9.2"
+      },
+      {
+        "tag": "v2.9.1",
+        "version": "2.9.1",
+        "published_at": "2026-07-07",
+        "url": "https://github.com/fluxcd/flux2/releases/tag/v2.9.1"
+      },
+      {
+        "tag": "v2.9.0",
+        "version": "2.9.0",
+        "published_at": "2026-06-30",
+        "url": "https://github.com/fluxcd/flux2/releases/tag/v2.9.0"
+      },
+      {
+        "tag": "v2.8.8",
+        "version": "2.8.8",
+        "published_at": "2026-05-20",
+        "url": "https://github.com/fluxcd/flux2/releases/tag/v2.8.8"
+      },
+      {
+        "tag": "v2.8.7",
+        "version": "2.8.7",
+        "published_at": "2026-05-12",
+        "url": "https://github.com/fluxcd/flux2/releases/tag/v2.8.7"
+      },
+      {
+        "tag": "v2.8.6",
+        "version": "2.8.6",
+        "published_at": "2026-04-21",
+        "url": "https://github.com/fluxcd/flux2/releases/tag/v2.8.6"
+      },
+      {
+        "tag": "v2.8.5",
+        "version": "2.8.5",
+        "published_at": "2026-04-07",
+        "url": "https://github.com/fluxcd/flux2/releases/tag/v2.8.5"
+      },
+      {
+        "tag": "v2.8.4",
+        "version": "2.8.4",
+        "published_at": "2026-04-07",
+        "url": "https://github.com/fluxcd/flux2/releases/tag/v2.8.4"
+      },
+      {
+        "tag": "v2.8.3",
+        "version": "2.8.3",
+        "published_at": "2026-03-16",
+        "url": "https://github.com/fluxcd/flux2/releases/tag/v2.8.3"
+      },
+      {
+        "tag": "v2.8.2",
+        "version": "2.8.2",
+        "published_at": "2026-03-12",
+        "url": "https://github.com/fluxcd/flux2/releases/tag/v2.8.2"
+      },
+      {
+        "tag": "v2.8.1",
+        "version": "2.8.1",
+        "published_at": "2026-02-27",
+        "url": "https://github.com/fluxcd/flux2/releases/tag/v2.8.1"
+      },
+      {
+        "tag": "v2.8.0",
+        "version": "2.8.0",
+        "published_at": "2026-02-24",
+        "url": "https://github.com/fluxcd/flux2/releases/tag/v2.8.0"
+      },
+      {
+        "tag": "v2.7.5",
+        "version": "2.7.5",
+        "published_at": "2025-11-27",
+        "url": "https://github.com/fluxcd/flux2/releases/tag/v2.7.5"
+      },
+      {
+        "tag": "v2.7.4",
+        "version": "2.7.4",
+        "published_at": "2025-11-24",
+        "url": "https://github.com/fluxcd/flux2/releases/tag/v2.7.4"
+      },
+      {
+        "tag": "v2.7.3",
+        "version": "2.7.3",
+        "published_at": "2025-10-28",
+        "url": "https://github.com/fluxcd/flux2/releases/tag/v2.7.3"
+      },
+      {
+        "tag": "v2.7.2",
+        "version": "2.7.2",
+        "published_at": "2025-10-08",
+        "url": "https://github.com/fluxcd/flux2/releases/tag/v2.7.2"
+      },
+      {
+        "tag": "v2.7.1",
+        "version": "2.7.1",
+        "published_at": "2025-10-06",
+        "url": "https://github.com/fluxcd/flux2/releases/tag/v2.7.1"
+      },
+      {
+        "tag": "v2.7.0",
+        "version": "2.7.0",
+        "published_at": "2025-09-30",
+        "url": "https://github.com/fluxcd/flux2/releases/tag/v2.7.0"
+      },
+      {
+        "tag": "v2.6.4",
+        "version": "2.6.4",
+        "published_at": "2025-07-08",
+        "url": "https://github.com/fluxcd/flux2/releases/tag/v2.6.4"
+      },
+      {
+        "tag": "v2.6.3",
+        "version": "2.6.3",
+        "published_at": "2025-06-27",
+        "url": "https://github.com/fluxcd/flux2/releases/tag/v2.6.3"
+      },
+      {
+        "tag": "v2.6.2",
+        "version": "2.6.2",
+        "published_at": "2025-06-16",
+        "url": "https://github.com/fluxcd/flux2/releases/tag/v2.6.2"
+      },
+      {
+        "tag": "v2.6.1",
+        "version": "2.6.1",
+        "published_at": "2025-06-02",
+        "url": "https://github.com/fluxcd/flux2/releases/tag/v2.6.1"
+      },
+      {
+        "tag": "v2.6.0",
+        "version": "2.6.0",
+        "published_at": "2025-05-29",
+        "url": "https://github.com/fluxcd/flux2/releases/tag/v2.6.0"
+      },
+      {
+        "tag": "v2.5.1",
+        "version": "2.5.1",
+        "published_at": "2025-02-25",
+        "url": "https://github.com/fluxcd/flux2/releases/tag/v2.5.1"
+      },
+      {
+        "tag": "v2.5.0",
+        "version": "2.5.0",
+        "published_at": "2025-02-20",
+        "url": "https://github.com/fluxcd/flux2/releases/tag/v2.5.0"
+      },
+      {
+        "tag": "v2.4.0",
+        "version": "2.4.0",
+        "published_at": "2024-09-30",
+        "url": "https://github.com/fluxcd/flux2/releases/tag/v2.4.0"
+      },
+      {
+        "tag": "v2.3.0",
+        "version": "2.3.0",
+        "published_at": "2024-05-13",
+        "url": "https://github.com/fluxcd/flux2/releases/tag/v2.3.0"
+      }
+    ],
+    "branch_patches": {
+      "2.9": {
+        "version": "2.9.5",
+        "release_date": "2026-08-31",
+        "eol": false
+      },
+      "2.8": {
+        "version": "2.8.8",
+        "release_date": "2026-05-20",
+        "eol": false
+      },
+      "2.7": {
+        "version": "2.7.5",
+        "release_date": "2025-11-27",
+        "eol": false
+      },
+      "2.6": {
+        "version": "2.6.4",
+        "release_date": "2025-07-08",
+        "eol": false
+      },
+      "2.5": {
+        "version": "2.5.1",
+        "release_date": "2025-11-20",
+        "eol": false
+      },
+      "2.4": {
+        "version": "2.4.0",
+        "release_date": "2025-08-15",
+        "eol": true
+      },
+      "2.3": {
+        "version": "2.3.0",
+        "release_date": "2025-05-10",
+        "eol": true
+      },
+      "2.2": {
+        "version": "2.2.3",
+        "release_date": "2024-12-15",
+        "eol": true
+      }
+    },
+    "last_checked": "2026-09-14T10:00:26.402Z"
+  },
+  "chrome": {
+    "software_key": "chrome",
+    "aliases": [
+      "chrome",
+      "google chrome",
+      "chromium"
+    ],
+    "canonical_name": "Google Chrome",
+    "source_type": "google_chrome",
+    "source_url": "https://chromereleases.googleblog.com/",
+    "latest_market_version": "154.0.8037.17",
+    "market_release_date": "2026-09-14",
+    "releases": [
+      {
+        "tag": "154.0.8037.17",
+        "version": "154.0.8037.17",
+        "published_at": "2026-09-08",
+        "url": "https://chromereleases.googleblog.com/"
+      },
+      {
+        "tag": "153.0.8010.37",
+        "version": "153.0.8010.37",
+        "published_at": "2026-08-20",
+        "url": "https://chromereleases.googleblog.com/"
+      }
+    ],
+    "branch_patches": {
+      "128": {
+        "version": "128.0.6613.138",
+        "release_date": "2024-09-10",
+        "eol": true
+      },
+      "130": {
+        "version": "130.0.6723.248",
+        "release_date": "2024-12-10",
+        "eol": true
+      },
+      "131": {
+        "version": "131.0.6778.248",
+        "release_date": "2025-01-15",
+        "eol": true
+      },
+      "153": {
+        "version": "153.0.8010.37",
+        "release_date": "2026-08-20",
+        "eol": false
+      },
+      "154": {
+        "version": "154.0.8037.17",
+        "release_date": "2026-09-14",
+        "eol": false
+      }
+    },
+    "last_checked": "2026-09-14T10:00:27.333Z"
+  },
+  "edge": {
+    "software_key": "edge",
+    "aliases": [
+      "edge",
+      "microsoft edge"
+    ],
+    "canonical_name": "Microsoft Edge",
+    "source_type": "static",
+    "source_url": "https://learn.microsoft.com/en-us/deployedge/microsoft-edge-relnote-stable-channel",
+    "latest_market_version": "151.0.4129.59",
+    "market_release_date": "2026-08-12",
+    "releases": [
+      {
+        "tag": "151.0.4129.59",
+        "version": "151.0.4129.59",
+        "published_at": "2026-08-12",
+        "url": "https://learn.microsoft.com/en-us/deployedge/microsoft-edge-relnote-stable-channel"
+      }
+    ],
+    "branch_patches": {
+      "128": {
+        "version": "128.0.2739.79",
+        "release_date": "2024-09-12",
+        "eol": true
+      },
+      "151": {
+        "version": "151.0.4129.59",
+        "release_date": "2026-08-12",
+        "eol": false
+      }
+    }
+  },
+  "keda": {
+    "software_key": "keda",
+    "aliases": [
+      "keda",
+      "kedacore/keda"
+    ],
+    "canonical_name": "KEDA Event-driven Autoscaler",
+    "source_type": "github",
+    "repo": "kedacore/keda",
+    "source_url": "https://github.com/kedacore/keda/releases",
+    "latest_market_version": "2.20.2",
+    "market_release_date": "2026-07-31",
+    "releases": [
+      {
+        "tag": "v2.20.2",
+        "version": "2.20.2",
+        "published_at": "2026-07-31",
+        "url": "https://github.com/kedacore/keda/releases/tag/v2.20.2"
+      },
+      {
+        "tag": "v2.20.1",
+        "version": "2.20.1",
+        "published_at": "2026-06-08",
+        "url": "https://github.com/kedacore/keda/releases/tag/v2.20.1"
+      },
+      {
+        "tag": "v2.20.0",
+        "version": "2.20.0",
+        "published_at": "2026-06-01",
+        "url": "https://github.com/kedacore/keda/releases/tag/v2.20.0"
+      },
+      {
+        "tag": "v2.19.0",
+        "version": "2.19.0",
+        "published_at": "2026-02-02",
+        "url": "https://github.com/kedacore/keda/releases/tag/v2.19.0"
+      },
+      {
+        "tag": "v2.18.3",
+        "version": "2.18.3",
+        "published_at": "2025-12-22",
+        "url": "https://github.com/kedacore/keda/releases/tag/v2.18.3"
+      },
+      {
+        "tag": "v2.18.2",
+        "version": "2.18.2",
+        "published_at": "2025-12-08",
+        "url": "https://github.com/kedacore/keda/releases/tag/v2.18.2"
+      },
+      {
+        "tag": "v2.18.1",
+        "version": "2.18.1",
+        "published_at": "2025-10-29",
+        "url": "https://github.com/kedacore/keda/releases/tag/v2.18.1"
+      },
+      {
+        "tag": "v2.18.0",
+        "version": "2.18.0",
+        "published_at": "2025-10-08",
+        "url": "https://github.com/kedacore/keda/releases/tag/v2.18.0"
+      },
+      {
+        "tag": "v2.17.3",
+        "version": "2.17.3",
+        "published_at": "2025-12-22",
+        "url": "https://github.com/kedacore/keda/releases/tag/v2.17.3"
+      },
+      {
+        "tag": "v2.17.2",
+        "version": "2.17.2",
+        "published_at": "2025-06-18",
+        "url": "https://github.com/kedacore/keda/releases/tag/v2.17.2"
+      },
+      {
+        "tag": "v2.17.1",
+        "version": "2.17.1",
+        "published_at": "2025-05-15",
+        "url": "https://github.com/kedacore/keda/releases/tag/v2.17.1"
+      },
+      {
+        "tag": "v2.17.0",
+        "version": "2.17.0",
+        "published_at": "2025-04-07",
+        "url": "https://github.com/kedacore/keda/releases/tag/v2.17.0"
+      },
+      {
+        "tag": "v2.16.1",
+        "version": "2.16.1",
+        "published_at": "2024-12-24",
+        "url": "https://github.com/kedacore/keda/releases/tag/v2.16.1"
+      },
+      {
+        "tag": "v2.16.0",
+        "version": "2.16.0",
+        "published_at": "2024-11-07",
+        "url": "https://github.com/kedacore/keda/releases/tag/v2.16.0"
+      },
+      {
+        "tag": "v2.15.1",
+        "version": "2.15.1",
+        "published_at": "2024-08-12",
+        "url": "https://github.com/kedacore/keda/releases/tag/v2.15.1"
+      },
+      {
+        "tag": "v2.15.0",
+        "version": "2.15.0",
+        "published_at": "2024-08-01",
+        "url": "https://github.com/kedacore/keda/releases/tag/v2.15.0"
+      },
+      {
+        "tag": "v2.14.1",
+        "version": "2.14.1",
+        "published_at": "2024-07-31",
+        "url": "https://github.com/kedacore/keda/releases/tag/v2.14.1"
+      },
+      {
+        "tag": "v2.14.0",
+        "version": "2.14.0",
+        "published_at": "2024-04-25",
+        "url": "https://github.com/kedacore/keda/releases/tag/v2.14.0"
+      },
+      {
+        "tag": "v2.13.1",
+        "version": "2.13.1",
+        "published_at": "2024-02-29",
+        "url": "https://github.com/kedacore/keda/releases/tag/v2.13.1"
+      },
+      {
+        "tag": "v2.13.0",
+        "version": "2.13.0",
+        "published_at": "2024-01-19",
+        "url": "https://github.com/kedacore/keda/releases/tag/v2.13.0"
+      },
+      {
+        "tag": "v2.12.1",
+        "version": "2.12.1",
+        "published_at": "2023-11-27",
+        "url": "https://github.com/kedacore/keda/releases/tag/v2.12.1"
+      },
+      {
+        "tag": "v2.12.0",
+        "version": "2.12.0",
+        "published_at": "2023-09-28",
+        "url": "https://github.com/kedacore/keda/releases/tag/v2.12.0"
+      },
+      {
+        "tag": "v2.11.2",
+        "version": "2.11.2",
+        "published_at": "2023-07-27",
+        "url": "https://github.com/kedacore/keda/releases/tag/v2.11.2"
+      },
+      {
+        "tag": "v2.11.1",
+        "version": "2.11.1",
+        "published_at": "2023-06-29",
+        "url": "https://github.com/kedacore/keda/releases/tag/v2.11.1"
+      },
+      {
+        "tag": "v2.11.0",
+        "version": "2.11.0",
+        "published_at": "2023-06-22",
+        "url": "https://github.com/kedacore/keda/releases/tag/v2.11.0"
+      },
+      {
+        "tag": "v2.10.1",
+        "version": "2.10.1",
+        "published_at": "2023-04-13",
+        "url": "https://github.com/kedacore/keda/releases/tag/v2.10.1"
+      },
+      {
+        "tag": "v2.10.0",
+        "version": "2.10.0",
+        "published_at": "2023-03-09",
+        "url": "https://github.com/kedacore/keda/releases/tag/v2.10.0"
+      },
+      {
+        "tag": "v2.9.3",
+        "version": "2.9.3",
+        "published_at": "2023-01-31",
+        "url": "https://github.com/kedacore/keda/releases/tag/v2.9.3"
+      },
+      {
+        "tag": "v2.9.2",
+        "version": "2.9.2",
+        "published_at": "2023-01-16",
+        "url": "https://github.com/kedacore/keda/releases/tag/v2.9.2"
+      },
+      {
+        "tag": "v2.8.2",
+        "version": "2.8.2",
+        "published_at": "2023-01-19",
+        "url": "https://github.com/kedacore/keda/releases/tag/v2.8.2"
+      }
+    ],
+    "branch_patches": {
+      "2.20": {
+        "version": "2.20.2",
+        "release_date": "2026-07-31",
+        "eol": false
+      },
+      "2.19": {
+        "version": "2.19.0",
+        "release_date": "2026-05-20",
+        "eol": false
+      },
+      "2.18": {
+        "version": "2.18.3",
+        "release_date": "2026-03-15",
+        "eol": false
+      },
+      "2.17": {
+        "version": "2.17.4",
+        "release_date": "2026-01-10",
+        "eol": false
+      },
+      "2.16": {
+        "version": "2.16.1",
+        "release_date": "2025-10-12",
+        "eol": true
+      },
+      "2.15": {
+        "version": "2.15.2",
+        "release_date": "2025-07-08",
+        "eol": true
+      },
+      "2.14": {
+        "version": "2.14.1",
+        "release_date": "2024-07-31",
+        "eol": false
+      },
+      "2.13": {
+        "version": "2.13.1",
+        "release_date": "2024-02-29",
+        "eol": false
+      },
+      "2.12": {
+        "version": "2.12.1",
+        "release_date": "2023-11-27",
+        "eol": false
+      },
+      "2.11": {
+        "version": "2.11.2",
+        "release_date": "2023-07-27",
+        "eol": false
+      },
+      "2.10": {
+        "version": "2.10.1",
+        "release_date": "2023-04-13",
+        "eol": false
+      },
+      "2.9": {
+        "version": "2.9.3",
+        "release_date": "2023-01-31",
+        "eol": false
+      },
+      "2.8": {
+        "version": "2.8.2",
+        "release_date": "2023-01-19",
+        "eol": false
+      }
+    },
+    "last_checked": "2026-09-14T10:00:26.195Z"
+  },
+  "kubernetes": {
+    "software_key": "kubernetes",
+    "aliases": [
+      "kubernetes",
+      "k8s",
+      "aks",
+      "azure kubernetes",
+      "kube-proxy"
+    ],
+    "canonical_name": "Kubernetes Engine",
+    "source_type": "github",
+    "repo": "kubernetes/kubernetes",
+    "source_url": "https://github.com/kubernetes/kubernetes/releases",
+    "latest_market_version": "1.37.0",
+    "market_release_date": "2026-08-26",
+    "releases": [
+      {
+        "tag": "v1.37.0",
+        "version": "1.37.0",
+        "published_at": "2026-08-26",
+        "url": "https://github.com/kubernetes/kubernetes/releases/tag/v1.37.0"
+      },
+      {
+        "tag": "v1.36.4",
+        "version": "1.36.4",
+        "published_at": "2026-08-20",
+        "url": "https://github.com/kubernetes/kubernetes/releases/tag/v1.36.4"
+      },
+      {
+        "tag": "v1.36.3",
+        "version": "1.36.3",
+        "published_at": "2026-07-23",
+        "url": "https://github.com/kubernetes/kubernetes/releases/tag/v1.36.3"
+      },
+      {
+        "tag": "v1.36.2",
+        "version": "1.36.2",
+        "published_at": "2026-06-12",
+        "url": "https://github.com/kubernetes/kubernetes/releases/tag/v1.36.2"
+      },
+      {
+        "tag": "v1.36.1",
+        "version": "1.36.1",
+        "published_at": "2026-05-12",
+        "url": "https://github.com/kubernetes/kubernetes/releases/tag/v1.36.1"
+      },
+      {
+        "tag": "v1.36.0",
+        "version": "1.36.0",
+        "published_at": "2026-04-22",
+        "url": "https://github.com/kubernetes/kubernetes/releases/tag/v1.36.0"
+      },
+      {
+        "tag": "v1.35.8",
+        "version": "1.35.8",
+        "published_at": "2026-08-20",
+        "url": "https://github.com/kubernetes/kubernetes/releases/tag/v1.35.8"
+      },
+      {
+        "tag": "v1.35.7",
+        "version": "1.35.7",
+        "published_at": "2026-07-22",
+        "url": "https://github.com/kubernetes/kubernetes/releases/tag/v1.35.7"
+      },
+      {
+        "tag": "v1.35.6",
+        "version": "1.35.6",
+        "published_at": "2026-06-12",
+        "url": "https://github.com/kubernetes/kubernetes/releases/tag/v1.35.6"
+      },
+      {
+        "tag": "v1.35.5",
+        "version": "1.35.5",
+        "published_at": "2026-05-12",
+        "url": "https://github.com/kubernetes/kubernetes/releases/tag/v1.35.5"
+      },
+      {
+        "tag": "v1.35.4",
+        "version": "1.35.4",
+        "published_at": "2026-04-15",
+        "url": "https://github.com/kubernetes/kubernetes/releases/tag/v1.35.4"
+      },
+      {
+        "tag": "v1.35.3",
+        "version": "1.35.3",
+        "published_at": "2026-03-19",
+        "url": "https://github.com/kubernetes/kubernetes/releases/tag/v1.35.3"
+      },
+      {
+        "tag": "v1.34.11",
+        "version": "1.34.11",
+        "published_at": "2026-08-20",
+        "url": "https://github.com/kubernetes/kubernetes/releases/tag/v1.34.11"
+      },
+      {
+        "tag": "v1.34.10",
+        "version": "1.34.10",
+        "published_at": "2026-07-22",
+        "url": "https://github.com/kubernetes/kubernetes/releases/tag/v1.34.10"
+      },
+      {
+        "tag": "v1.34.9",
+        "version": "1.34.9",
+        "published_at": "2026-06-12",
+        "url": "https://github.com/kubernetes/kubernetes/releases/tag/v1.34.9"
+      },
+      {
+        "tag": "v1.34.8",
+        "version": "1.34.8",
+        "published_at": "2026-05-12",
+        "url": "https://github.com/kubernetes/kubernetes/releases/tag/v1.34.8"
+      },
+      {
+        "tag": "v1.34.7",
+        "version": "1.34.7",
+        "published_at": "2026-04-15",
+        "url": "https://github.com/kubernetes/kubernetes/releases/tag/v1.34.7"
+      },
+      {
+        "tag": "v1.34.6",
+        "version": "1.34.6",
+        "published_at": "2026-03-19",
+        "url": "https://github.com/kubernetes/kubernetes/releases/tag/v1.34.6"
+      },
+      {
+        "tag": "v1.33.13",
+        "version": "1.33.13",
+        "published_at": "2026-06-12",
+        "url": "https://github.com/kubernetes/kubernetes/releases/tag/v1.33.13"
+      },
+      {
+        "tag": "v1.33.12",
+        "version": "1.33.12",
+        "published_at": "2026-05-12",
+        "url": "https://github.com/kubernetes/kubernetes/releases/tag/v1.33.12"
+      },
+      {
+        "tag": "v1.33.11",
+        "version": "1.33.11",
+        "published_at": "2026-04-15",
+        "url": "https://github.com/kubernetes/kubernetes/releases/tag/v1.33.11"
+      }
+    ],
+    "branch_patches": {
+      "1.37": {
+        "version": "1.37.0",
+        "release_date": "2026-08-26",
+        "eol": false
+      },
+      "1.36": {
+        "version": "1.36.4",
+        "release_date": "2026-08-20",
+        "eol": false
+      },
+      "1.35": {
+        "version": "1.35.8",
+        "release_date": "2026-08-20",
+        "eol": false
+      },
+      "1.34": {
+        "version": "1.34.11",
+        "release_date": "2026-08-20",
+        "eol": false
+      },
+      "1.33": {
+        "version": "1.33.13",
+        "release_date": "2026-06-12",
+        "eol": false
+      },
+      "1.30": {
+        "version": "1.30.9",
+        "release_date": "2025-01-15",
+        "eol": true
+      },
+      "1.29": {
+        "version": "1.29.13",
+        "release_date": "2025-01-15",
+        "eol": true
+      },
+      "1.28": {
+        "version": "1.28.15",
+        "release_date": "2024-10-16",
+        "eol": true
+      }
+    },
+    "last_checked": "2026-09-14T10:00:26.109Z"
+  },
+  "gatekeeper": {
+    "software_key": "gatekeeper",
+    "aliases": [
+      "gatekeeper",
+      "open-policy-agent/gatekeeper",
+      "opa gatekeeper"
+    ],
+    "canonical_name": "OPA Gatekeeper",
+    "source_type": "github",
+    "repo": "open-policy-agent/gatekeeper",
+    "source_url": "https://github.com/open-policy-agent/gatekeeper/releases",
+    "latest_market_version": "3.23.1",
+    "market_release_date": "2026-08-27",
+    "releases": [
+      {
+        "tag": "v3.23.1",
+        "version": "3.23.1",
+        "published_at": "2026-08-27",
+        "url": "https://github.com/open-policy-agent/gatekeeper/releases/tag/v3.23.1"
+      },
+      {
+        "tag": "v3.23.0",
+        "version": "3.23.0",
+        "published_at": "2026-07-09",
+        "url": "https://github.com/open-policy-agent/gatekeeper/releases/tag/v3.23.0"
+      },
+      {
+        "tag": "v3.22.2",
+        "version": "3.22.2",
+        "published_at": "2026-04-27",
+        "url": "https://github.com/open-policy-agent/gatekeeper/releases/tag/v3.22.2"
+      },
+      {
+        "tag": "v3.22.1",
+        "version": "3.22.1",
+        "published_at": "2026-04-13",
+        "url": "https://github.com/open-policy-agent/gatekeeper/releases/tag/v3.22.1"
+      },
+      {
+        "tag": "v3.22.0",
+        "version": "3.22.0",
+        "published_at": "2026-03-10",
+        "url": "https://github.com/open-policy-agent/gatekeeper/releases/tag/v3.22.0"
+      },
+      {
+        "tag": "v3.21.1",
+        "version": "3.21.1",
+        "published_at": "2026-02-04",
+        "url": "https://github.com/open-policy-agent/gatekeeper/releases/tag/v3.21.1"
+      },
+      {
+        "tag": "v3.21.0",
+        "version": "3.21.0",
+        "published_at": "2025-11-19",
+        "url": "https://github.com/open-policy-agent/gatekeeper/releases/tag/v3.21.0"
+      },
+      {
+        "tag": "v3.20.1",
+        "version": "3.20.1",
+        "published_at": "2025-08-29",
+        "url": "https://github.com/open-policy-agent/gatekeeper/releases/tag/v3.20.1"
+      },
+      {
+        "tag": "v3.20.0",
+        "version": "3.20.0",
+        "published_at": "2025-07-24",
+        "url": "https://github.com/open-policy-agent/gatekeeper/releases/tag/v3.20.0"
+      },
+      {
+        "tag": "v3.19.3",
+        "version": "3.19.3",
+        "published_at": "2025-07-15",
+        "url": "https://github.com/open-policy-agent/gatekeeper/releases/tag/v3.19.3"
+      },
+      {
+        "tag": "v3.19.2",
+        "version": "3.19.2",
+        "published_at": "2025-06-17",
+        "url": "https://github.com/open-policy-agent/gatekeeper/releases/tag/v3.19.2"
+      },
+      {
+        "tag": "v3.19.1",
+        "version": "3.19.1",
+        "published_at": "2025-04-25",
+        "url": "https://github.com/open-policy-agent/gatekeeper/releases/tag/v3.19.1"
+      },
+      {
+        "tag": "v3.19.0",
+        "version": "3.19.0",
+        "published_at": "2025-04-09",
+        "url": "https://github.com/open-policy-agent/gatekeeper/releases/tag/v3.19.0"
+      },
+      {
+        "tag": "v3.18.3",
+        "version": "3.18.3",
+        "published_at": "2025-04-25",
+        "url": "https://github.com/open-policy-agent/gatekeeper/releases/tag/v3.18.3"
+      },
+      {
+        "tag": "v3.18.2",
+        "version": "3.18.2",
+        "published_at": "2025-01-09",
+        "url": "https://github.com/open-policy-agent/gatekeeper/releases/tag/v3.18.2"
+      },
+      {
+        "tag": "v3.17.2",
+        "version": "3.17.2",
+        "published_at": "2025-01-24",
+        "url": "https://github.com/open-policy-agent/gatekeeper/releases/tag/v3.17.2"
+      }
+    ],
+    "branch_patches": {
+      "3.23": {
+        "version": "3.23.1",
+        "release_date": "2026-08-27",
+        "eol": false
+      },
+      "3.22": {
+        "version": "3.22.2",
+        "release_date": "2026-04-27",
+        "eol": false
+      },
+      "3.18": {
+        "version": "3.18.3",
+        "release_date": "2025-04-25",
+        "eol": true
+      },
+      "3.21": {
+        "version": "3.21.1",
+        "release_date": "2026-02-04",
+        "eol": false
+      },
+      "3.20": {
+        "version": "3.20.1",
+        "release_date": "2025-08-29",
+        "eol": false
+      },
+      "3.19": {
+        "version": "3.19.3",
+        "release_date": "2025-07-15",
+        "eol": false
+      },
+      "3.17": {
+        "version": "3.17.2",
+        "release_date": "2025-01-24",
+        "eol": false
+      }
+    },
+    "last_checked": "2026-09-14T10:00:26.239Z"
+  },
+  "calico": {
+    "software_key": "calico",
+    "aliases": [
+      "calico",
+      "tigera",
+      "projectcalico",
+      "calico cni"
+    ],
+    "canonical_name": "Tigera Calico CNI",
+    "source_type": "github",
+    "repo": "projectcalico/calico",
+    "source_url": "https://github.com/projectcalico/calico/releases",
+    "latest_market_version": "3.32.2",
+    "market_release_date": "2026-08-30",
+    "releases": [
+      {
+        "tag": "v3.32.2",
+        "version": "3.32.2",
+        "published_at": "2026-08-30",
+        "url": "https://github.com/projectcalico/calico/releases/tag/v3.32.2"
+      },
+      {
+        "tag": "v3.32.1",
+        "version": "3.32.1",
+        "published_at": "2026-06-26",
+        "url": "https://github.com/projectcalico/calico/releases/tag/v3.32.1"
+      },
+      {
+        "tag": "v3.32.0",
+        "version": "3.32.0",
+        "published_at": "2026-04-30",
+        "url": "https://github.com/projectcalico/calico/releases/tag/v3.32.0"
+      },
+      {
+        "tag": "v3.31.7",
+        "version": "3.31.7",
+        "published_at": "2026-08-21",
+        "url": "https://github.com/projectcalico/calico/releases/tag/v3.31.7"
+      },
+      {
+        "tag": "v3.31.6",
+        "version": "3.31.6",
+        "published_at": "2026-06-19",
+        "url": "https://github.com/projectcalico/calico/releases/tag/v3.31.6"
+      },
+      {
+        "tag": "v3.31.5",
+        "version": "3.31.5",
+        "published_at": "2026-04-15",
+        "url": "https://github.com/projectcalico/calico/releases/tag/v3.31.5"
+      },
+      {
+        "tag": "v3.31.4",
+        "version": "3.31.4",
+        "published_at": "2026-02-21",
+        "url": "https://github.com/projectcalico/calico/releases/tag/v3.31.4"
+      },
+      {
+        "tag": "v3.31.3",
+        "version": "3.31.3",
+        "published_at": "2025-12-19",
+        "url": "https://github.com/projectcalico/calico/releases/tag/v3.31.3"
+      },
+      {
+        "tag": "v3.31.2",
+        "version": "3.31.2",
+        "published_at": "2025-11-18",
+        "url": "https://github.com/projectcalico/calico/releases/tag/v3.31.2"
+      },
+      {
+        "tag": "v3.31.1",
+        "version": "3.31.1",
+        "published_at": "2025-11-14",
+        "url": "https://github.com/projectcalico/calico/releases/tag/v3.31.1"
+      },
+      {
+        "tag": "v3.31.0",
+        "version": "3.31.0",
+        "published_at": "2025-10-22",
+        "url": "https://github.com/projectcalico/calico/releases/tag/v3.31.0"
+      },
+      {
+        "tag": "v3.30.7",
+        "version": "3.30.7",
+        "published_at": "2026-03-19",
+        "url": "https://github.com/projectcalico/calico/releases/tag/v3.30.7"
+      },
+      {
+        "tag": "v3.30.6",
+        "version": "3.30.6",
+        "published_at": "2026-01-23",
+        "url": "https://github.com/projectcalico/calico/releases/tag/v3.30.6"
+      },
+      {
+        "tag": "v3.30.5",
+        "version": "3.30.5",
+        "published_at": "2025-11-27",
+        "url": "https://github.com/projectcalico/calico/releases/tag/v3.30.5"
+      },
+      {
+        "tag": "v3.30.4",
+        "version": "3.30.4",
+        "published_at": "2025-10-16",
+        "url": "https://github.com/projectcalico/calico/releases/tag/v3.30.4"
+      },
+      {
+        "tag": "v3.30.3",
+        "version": "3.30.3",
+        "published_at": "2025-08-22",
+        "url": "https://github.com/projectcalico/calico/releases/tag/v3.30.3"
+      },
+      {
+        "tag": "v3.30.2",
+        "version": "3.30.2",
+        "published_at": "2025-06-20",
+        "url": "https://github.com/projectcalico/calico/releases/tag/v3.30.2"
+      },
+      {
+        "tag": "v3.30.1",
+        "version": "3.30.1",
+        "published_at": "2025-05-30",
+        "url": "https://github.com/projectcalico/calico/releases/tag/v3.30.1"
+      },
+      {
+        "tag": "v3.30.0",
+        "version": "3.30.0",
+        "published_at": "2025-05-06",
+        "url": "https://github.com/projectcalico/calico/releases/tag/v3.30.0"
+      },
+      {
+        "tag": "v3.29.7",
+        "version": "3.29.7",
+        "published_at": "2025-11-20",
+        "url": "https://github.com/projectcalico/calico/releases/tag/v3.29.7"
+      },
+      {
+        "tag": "v3.29.6",
+        "version": "3.29.6",
+        "published_at": "2025-09-19",
+        "url": "https://github.com/projectcalico/calico/releases/tag/v3.29.6"
+      },
+      {
+        "tag": "v3.29.5",
+        "version": "3.29.5",
+        "published_at": "2025-07-18",
+        "url": "https://github.com/projectcalico/calico/releases/tag/v3.29.5"
+      },
+      {
+        "tag": "v3.29.4",
+        "version": "3.29.4",
+        "published_at": "2025-05-21",
+        "url": "https://github.com/projectcalico/calico/releases/tag/v3.29.4"
+      },
+      {
+        "tag": "v3.29.3",
+        "version": "3.29.3",
+        "published_at": "2025-03-25",
+        "url": "https://github.com/projectcalico/calico/releases/tag/v3.29.3"
+      },
+      {
+        "tag": "v3.29.2",
+        "version": "3.29.2",
+        "published_at": "2025-02-06",
+        "url": "https://github.com/projectcalico/calico/releases/tag/v3.29.2"
+      },
+      {
+        "tag": "v3.29.1",
+        "version": "3.29.1",
+        "published_at": "2024-11-21",
+        "url": "https://github.com/projectcalico/calico/releases/tag/v3.29.1"
+      },
+      {
+        "tag": "v3.28.5",
+        "version": "3.28.5",
+        "published_at": "2025-06-12",
+        "url": "https://github.com/projectcalico/calico/releases/tag/v3.28.5"
+      },
+      {
+        "tag": "v3.28.4",
+        "version": "3.28.4",
+        "published_at": "2025-04-16",
+        "url": "https://github.com/projectcalico/calico/releases/tag/v3.28.4"
+      },
+      {
+        "tag": "v3.28.3",
+        "version": "3.28.3",
+        "published_at": "2025-02-20",
+        "url": "https://github.com/projectcalico/calico/releases/tag/v3.28.3"
+      },
+      {
+        "tag": "v3.27.5",
+        "version": "3.27.5",
+        "published_at": "2024-11-28",
+        "url": "https://github.com/projectcalico/calico/releases/tag/v3.27.5"
+      }
+    ],
+    "branch_patches": {
+      "3.32": {
+        "version": "3.32.2",
+        "release_date": "2026-08-30",
+        "eol": false
+      },
+      "3.31": {
+        "version": "3.31.7",
+        "release_date": "2026-08-21",
+        "eol": false
+      },
+      "3.29": {
+        "version": "3.29.7",
+        "release_date": "2025-11-20",
+        "eol": true
+      },
+      "3.30": {
+        "version": "3.30.7",
+        "release_date": "2026-03-19",
+        "eol": false
+      },
+      "3.28": {
+        "version": "3.28.5",
+        "release_date": "2025-06-12",
+        "eol": false
+      },
+      "3.27": {
+        "version": "3.27.5",
+        "release_date": "2024-11-28",
+        "eol": false
+      }
+    },
+    "last_checked": "2026-09-14T10:00:26.259Z"
+  },
+  "coredns": {
+    "software_key": "coredns",
+    "aliases": [
+      "coredns"
+    ],
+    "canonical_name": "CoreDNS",
+    "source_type": "github",
+    "repo": "coredns/coredns",
+    "source_url": "https://github.com/coredns/coredns/releases",
+    "latest_market_version": "1.14.7",
+    "market_release_date": "2026-08-19",
+    "releases": [
+      {
+        "tag": "v1.14.7",
+        "version": "1.14.7",
+        "published_at": "2026-08-19",
+        "url": "https://github.com/coredns/coredns/releases/tag/v1.14.7"
+      },
+      {
+        "tag": "v1.14.6",
+        "version": "1.14.6",
+        "published_at": "2026-07-10",
+        "url": "https://github.com/coredns/coredns/releases/tag/v1.14.6"
+      },
+      {
+        "tag": "v1.14.5",
+        "version": "1.14.5",
+        "published_at": "2026-07-10",
+        "url": "https://github.com/coredns/coredns/releases/tag/v1.14.5"
+      },
+      {
+        "tag": "v1.14.4",
+        "version": "1.14.4",
+        "published_at": "2026-06-09",
+        "url": "https://github.com/coredns/coredns/releases/tag/v1.14.4"
+      },
+      {
+        "tag": "v1.14.3",
+        "version": "1.14.3",
+        "published_at": "2026-04-22",
+        "url": "https://github.com/coredns/coredns/releases/tag/v1.14.3"
+      },
+      {
+        "tag": "v1.14.2",
+        "version": "1.14.2",
+        "published_at": "2026-03-06",
+        "url": "https://github.com/coredns/coredns/releases/tag/v1.14.2"
+      },
+      {
+        "tag": "v1.14.1",
+        "version": "1.14.1",
+        "published_at": "2026-01-16",
+        "url": "https://github.com/coredns/coredns/releases/tag/v1.14.1"
+      },
+      {
+        "tag": "v1.14.0",
+        "version": "1.14.0",
+        "published_at": "2026-01-08",
+        "url": "https://github.com/coredns/coredns/releases/tag/v1.14.0"
+      },
+      {
+        "tag": "v1.13.2",
+        "version": "1.13.2",
+        "published_at": "2025-12-10",
+        "url": "https://github.com/coredns/coredns/releases/tag/v1.13.2"
+      },
+      {
+        "tag": "v1.13.1",
+        "version": "1.13.1",
+        "published_at": "2025-10-08",
+        "url": "https://github.com/coredns/coredns/releases/tag/v1.13.1"
+      },
+      {
+        "tag": "v1.13.0",
+        "version": "1.13.0",
+        "published_at": "2025-10-06",
+        "url": "https://github.com/coredns/coredns/releases/tag/v1.13.0"
+      },
+      {
+        "tag": "v1.12.4",
+        "version": "1.12.4",
+        "published_at": "2025-09-09",
+        "url": "https://github.com/coredns/coredns/releases/tag/v1.12.4"
+      },
+      {
+        "tag": "v1.12.3",
+        "version": "1.12.3",
+        "published_at": "2025-08-05",
+        "url": "https://github.com/coredns/coredns/releases/tag/v1.12.3"
+      },
+      {
+        "tag": "v1.12.2",
+        "version": "1.12.2",
+        "published_at": "2025-06-06",
+        "url": "https://github.com/coredns/coredns/releases/tag/v1.12.2"
+      },
+      {
+        "tag": "v1.12.1",
+        "version": "1.12.1",
+        "published_at": "2025-03-31",
+        "url": "https://github.com/coredns/coredns/releases/tag/v1.12.1"
+      },
+      {
+        "tag": "v1.12.0",
+        "version": "1.12.0",
+        "published_at": "2024-11-21",
+        "url": "https://github.com/coredns/coredns/releases/tag/v1.12.0"
+      },
+      {
+        "tag": "v1.11.4",
+        "version": "1.11.4",
+        "published_at": "2024-11-13",
+        "url": "https://github.com/coredns/coredns/releases/tag/v1.11.4"
+      },
+      {
+        "tag": "v1.11.3",
+        "version": "1.11.3",
+        "published_at": "2024-07-29",
+        "url": "https://github.com/coredns/coredns/releases/tag/v1.11.3"
+      },
+      {
+        "tag": "v1.11.1",
+        "version": "1.11.1",
+        "published_at": "2023-08-15",
+        "url": "https://github.com/coredns/coredns/releases/tag/v1.11.1"
+      },
+      {
+        "tag": "v1.11.0",
+        "version": "1.11.0",
+        "published_at": "2023-08-08",
+        "url": "https://github.com/coredns/coredns/releases/tag/v1.11.0"
+      },
+      {
+        "tag": "v1.10.1",
+        "version": "1.10.1",
+        "published_at": "2023-02-06",
+        "url": "https://github.com/coredns/coredns/releases/tag/v1.10.1"
+      },
+      {
+        "tag": "v1.10.0",
+        "version": "1.10.0",
+        "published_at": "2022-09-19",
+        "url": "https://github.com/coredns/coredns/releases/tag/v1.10.0"
+      },
+      {
+        "tag": "v1.9.4",
+        "version": "1.9.4",
+        "published_at": "2022-09-08",
+        "url": "https://github.com/coredns/coredns/releases/tag/v1.9.4"
+      },
+      {
+        "tag": "v1.9.3",
+        "version": "1.9.3",
+        "published_at": "2022-05-27",
+        "url": "https://github.com/coredns/coredns/releases/tag/v1.9.3"
+      },
+      {
+        "tag": "v1.9.2",
+        "version": "1.9.2",
+        "published_at": "2022-05-10",
+        "url": "https://github.com/coredns/coredns/releases/tag/v1.9.2"
+      },
+      {
+        "tag": "v1.9.1",
+        "version": "1.9.1",
+        "published_at": "2022-03-11",
+        "url": "https://github.com/coredns/coredns/releases/tag/v1.9.1"
+      },
+      {
+        "tag": "v1.9.0",
+        "version": "1.9.0",
+        "published_at": "2022-02-09",
+        "url": "https://github.com/coredns/coredns/releases/tag/v1.9.0"
+      },
+      {
+        "tag": "v1.8.7",
+        "version": "1.8.7",
+        "published_at": "2022-01-14",
+        "url": "https://github.com/coredns/coredns/releases/tag/v1.8.7"
+      },
+      {
+        "tag": "v1.8.6",
+        "version": "1.8.6",
+        "published_at": "2021-10-07",
+        "url": "https://github.com/coredns/coredns/releases/tag/v1.8.6"
+      },
+      {
+        "tag": "v1.8.5",
+        "version": "1.8.5",
+        "published_at": "2021-09-21",
+        "url": "https://github.com/coredns/coredns/releases/tag/v1.8.5"
+      }
+    ],
+    "branch_patches": {
+      "1.14": {
+        "version": "1.14.7",
+        "release_date": "2026-08-19",
+        "eol": false
+      },
+      "1.13": {
+        "version": "1.13.2",
+        "release_date": "2026-04-10",
+        "eol": false
+      },
+      "1.12": {
+        "version": "1.12.4",
+        "release_date": "2025-09-09",
+        "eol": true
+      },
+      "1.11": {
+        "version": "1.11.4",
+        "release_date": "2024-11-13",
+        "eol": false
+      },
+      "1.10": {
+        "version": "1.10.1",
+        "release_date": "2023-02-06",
+        "eol": false
+      },
+      "1.9": {
+        "version": "1.9.4",
+        "release_date": "2022-09-08",
+        "eol": false
+      },
+      "1.8": {
+        "version": "1.8.7",
+        "release_date": "2022-01-14",
+        "eol": false
+      }
+    },
+    "last_checked": "2026-09-14T10:00:26.430Z"
+  },
+  "redis": {
+    "software_key": "redis",
+    "aliases": [
+      "redis",
+      "redis-server"
+    ],
+    "canonical_name": "Redis Enterprise",
+    "source_type": "github",
+    "repo": "redis/redis",
+    "source_url": "https://github.com/redis/redis/releases",
+    "latest_market_version": "8.10.1",
+    "market_release_date": "2026-08-17",
+    "releases": [
+      {
+        "tag": "8.10.1",
+        "version": "8.10.1",
+        "published_at": "2026-08-17",
+        "url": "https://github.com/redis/redis/releases/tag/8.10.1"
+      },
+      {
+        "tag": "8.10.0",
+        "version": "8.10.0",
+        "published_at": "2026-07-29",
+        "url": "https://github.com/redis/redis/releases/tag/8.10.0"
+      },
+      {
+        "tag": "8.8.2",
+        "version": "8.8.2",
+        "published_at": "2026-08-17",
+        "url": "https://github.com/redis/redis/releases/tag/8.8.2"
+      },
+      {
+        "tag": "8.8.1",
+        "version": "8.8.1",
+        "published_at": "2026-07-23",
+        "url": "https://github.com/redis/redis/releases/tag/8.8.1"
+      },
+      {
+        "tag": "8.8.0",
+        "version": "8.8.0",
+        "published_at": "2026-05-25",
+        "url": "https://github.com/redis/redis/releases/tag/8.8.0"
+      },
+      {
+        "tag": "8.6.6",
+        "version": "8.6.6",
+        "published_at": "2026-08-17",
+        "url": "https://github.com/redis/redis/releases/tag/8.6.6"
+      },
+      {
+        "tag": "8.6.5",
+        "version": "8.6.5",
+        "published_at": "2026-07-23",
+        "url": "https://github.com/redis/redis/releases/tag/8.6.5"
+      },
+      {
+        "tag": "8.6.4",
+        "version": "8.6.4",
+        "published_at": "2026-06-04",
+        "url": "https://github.com/redis/redis/releases/tag/8.6.4"
+      },
+      {
+        "tag": "8.6.3",
+        "version": "8.6.3",
+        "published_at": "2026-05-05",
+        "url": "https://github.com/redis/redis/releases/tag/8.6.3"
+      },
+      {
+        "tag": "8.4.6",
+        "version": "8.4.6",
+        "published_at": "2026-08-17",
+        "url": "https://github.com/redis/redis/releases/tag/8.4.6"
+      },
+      {
+        "tag": "8.4.5",
+        "version": "8.4.5",
+        "published_at": "2026-07-23",
+        "url": "https://github.com/redis/redis/releases/tag/8.4.5"
+      },
+      {
+        "tag": "8.4.4",
+        "version": "8.4.4",
+        "published_at": "2026-06-04",
+        "url": "https://github.com/redis/redis/releases/tag/8.4.4"
+      },
+      {
+        "tag": "8.4.3",
+        "version": "8.4.3",
+        "published_at": "2026-05-05",
+        "url": "https://github.com/redis/redis/releases/tag/8.4.3"
+      },
+      {
+        "tag": "8.2.9",
+        "version": "8.2.9",
+        "published_at": "2026-08-17",
+        "url": "https://github.com/redis/redis/releases/tag/8.2.9"
+      },
+      {
+        "tag": "8.2.8",
+        "version": "8.2.8",
+        "published_at": "2026-07-23",
+        "url": "https://github.com/redis/redis/releases/tag/8.2.8"
+      },
+      {
+        "tag": "8.2.7",
+        "version": "8.2.7",
+        "published_at": "2026-06-04",
+        "url": "https://github.com/redis/redis/releases/tag/8.2.7"
+      },
+      {
+        "tag": "8.2.6",
+        "version": "8.2.6",
+        "published_at": "2026-05-05",
+        "url": "https://github.com/redis/redis/releases/tag/8.2.6"
+      },
+      {
+        "tag": "7.4.11",
+        "version": "7.4.11",
+        "published_at": "2026-08-17",
+        "url": "https://github.com/redis/redis/releases/tag/7.4.11"
+      },
+      {
+        "tag": "7.4.10",
+        "version": "7.4.10",
+        "published_at": "2026-07-23",
+        "url": "https://github.com/redis/redis/releases/tag/7.4.10"
+      },
+      {
+        "tag": "7.4.9",
+        "version": "7.4.9",
+        "published_at": "2026-05-05",
+        "url": "https://github.com/redis/redis/releases/tag/7.4.9"
+      },
+      {
+        "tag": "7.2.16",
+        "version": "7.2.16",
+        "published_at": "2026-08-17",
+        "url": "https://github.com/redis/redis/releases/tag/7.2.16"
+      },
+      {
+        "tag": "7.2.15",
+        "version": "7.2.15",
+        "published_at": "2026-07-23",
+        "url": "https://github.com/redis/redis/releases/tag/7.2.15"
+      },
+      {
+        "tag": "7.2.14",
+        "version": "7.2.14",
+        "published_at": "2026-05-05",
+        "url": "https://github.com/redis/redis/releases/tag/7.2.14"
+      },
+      {
+        "tag": "6.2.24",
+        "version": "6.2.24",
+        "published_at": "2026-08-17",
+        "url": "https://github.com/redis/redis/releases/tag/6.2.24"
+      },
+      {
+        "tag": "6.2.23",
+        "version": "6.2.23",
+        "published_at": "2026-07-23",
+        "url": "https://github.com/redis/redis/releases/tag/6.2.23"
+      },
+      {
+        "tag": "6.2.22",
+        "version": "6.2.22",
+        "published_at": "2026-05-05",
+        "url": "https://github.com/redis/redis/releases/tag/6.2.22"
+      }
+    ],
+    "branch_patches": {
+      "8.10": {
+        "version": "8.10.1",
+        "release_date": "2026-08-17",
+        "eol": false
+      },
+      "8.8": {
+        "version": "8.8.2",
+        "release_date": "2026-08-17",
+        "eol": false
+      },
+      "7.4": {
+        "version": "7.4.11",
+        "release_date": "2026-08-17",
+        "eol": true
+      },
+      "8.6": {
+        "version": "8.6.6",
+        "release_date": "2026-08-17",
+        "eol": false
+      },
+      "8.4": {
+        "version": "8.4.6",
+        "release_date": "2026-08-17",
+        "eol": false
+      },
+      "8.2": {
+        "version": "8.2.9",
+        "release_date": "2026-08-17",
+        "eol": false
+      },
+      "7.2": {
+        "version": "7.2.16",
+        "release_date": "2026-08-17",
+        "eol": false
+      },
+      "6.2": {
+        "version": "6.2.24",
+        "release_date": "2026-08-17",
+        "eol": false
+      }
+    },
+    "last_checked": "2026-09-14T10:00:26.147Z"
+  },
+  "nginx": {
+    "software_key": "nginx",
+    "aliases": [
+      "nginx",
+      "nginx-ingress"
+    ],
+    "canonical_name": "NGINX Web Server",
+    "source_type": "github",
+    "repo": "nginx/nginx",
+    "source_url": "https://github.com/nginx/nginx/releases",
+    "latest_market_version": "1.31.5",
+    "market_release_date": "2026-09-02",
+    "releases": [
+      {
+        "tag": "release-1.31.5",
+        "version": "1.31.5",
+        "published_at": "2026-09-02",
+        "url": "https://github.com/nginx/nginx/releases/tag/release-1.31.5"
+      },
+      {
+        "tag": "release-1.31.4",
+        "version": "1.31.4",
+        "published_at": "2026-08-19",
+        "url": "https://github.com/nginx/nginx/releases/tag/release-1.31.4"
+      },
+      {
+        "tag": "release-1.31.3",
+        "version": "1.31.3",
+        "published_at": "2026-07-15",
+        "url": "https://github.com/nginx/nginx/releases/tag/release-1.31.3"
+      },
+      {
+        "tag": "release-1.31.2",
+        "version": "1.31.2",
+        "published_at": "2026-06-17",
+        "url": "https://github.com/nginx/nginx/releases/tag/release-1.31.2"
+      },
+      {
+        "tag": "release-1.31.1",
+        "version": "1.31.1",
+        "published_at": "2026-05-22",
+        "url": "https://github.com/nginx/nginx/releases/tag/release-1.31.1"
+      },
+      {
+        "tag": "release-1.31.0",
+        "version": "1.31.0",
+        "published_at": "2026-05-13",
+        "url": "https://github.com/nginx/nginx/releases/tag/release-1.31.0"
+      },
+      {
+        "tag": "release-1.30.4",
+        "version": "1.30.4",
+        "published_at": "2026-07-15",
+        "url": "https://github.com/nginx/nginx/releases/tag/release-1.30.4"
+      },
+      {
+        "tag": "release-1.30.3",
+        "version": "1.30.3",
+        "published_at": "2026-06-17",
+        "url": "https://github.com/nginx/nginx/releases/tag/release-1.30.3"
+      },
+      {
+        "tag": "release-1.30.2",
+        "version": "1.30.2",
+        "published_at": "2026-05-22",
+        "url": "https://github.com/nginx/nginx/releases/tag/release-1.30.2"
+      },
+      {
+        "tag": "release-1.30.1",
+        "version": "1.30.1",
+        "published_at": "2026-05-13",
+        "url": "https://github.com/nginx/nginx/releases/tag/release-1.30.1"
+      },
+      {
+        "tag": "release-1.30.0",
+        "version": "1.30.0",
+        "published_at": "2026-04-14",
+        "url": "https://github.com/nginx/nginx/releases/tag/release-1.30.0"
+      },
+      {
+        "tag": "release-1.29.8",
+        "version": "1.29.8",
+        "published_at": "2026-04-07",
+        "url": "https://github.com/nginx/nginx/releases/tag/release-1.29.8"
+      },
+      {
+        "tag": "release-1.29.7",
+        "version": "1.29.7",
+        "published_at": "2026-03-24",
+        "url": "https://github.com/nginx/nginx/releases/tag/release-1.29.7"
+      },
+      {
+        "tag": "release-1.29.6",
+        "version": "1.29.6",
+        "published_at": "2026-03-10",
+        "url": "https://github.com/nginx/nginx/releases/tag/release-1.29.6"
+      },
+      {
+        "tag": "release-1.29.5",
+        "version": "1.29.5",
+        "published_at": "2026-02-04",
+        "url": "https://github.com/nginx/nginx/releases/tag/release-1.29.5"
+      },
+      {
+        "tag": "release-1.29.4",
+        "version": "1.29.4",
+        "published_at": "2025-12-09",
+        "url": "https://github.com/nginx/nginx/releases/tag/release-1.29.4"
+      },
+      {
+        "tag": "release-1.29.3",
+        "version": "1.29.3",
+        "published_at": "2025-10-28",
+        "url": "https://github.com/nginx/nginx/releases/tag/release-1.29.3"
+      },
+      {
+        "tag": "release-1.29.2",
+        "version": "1.29.2",
+        "published_at": "2025-10-07",
+        "url": "https://github.com/nginx/nginx/releases/tag/release-1.29.2"
+      },
+      {
+        "tag": "release-1.29.1",
+        "version": "1.29.1",
+        "published_at": "2025-08-13",
+        "url": "https://github.com/nginx/nginx/releases/tag/release-1.29.1"
+      },
+      {
+        "tag": "release-1.29.0",
+        "version": "1.29.0",
+        "published_at": "2025-06-25",
+        "url": "https://github.com/nginx/nginx/releases/tag/release-1.29.0"
+      },
+      {
+        "tag": "release-1.28.3",
+        "version": "1.28.3",
+        "published_at": "2026-03-24",
+        "url": "https://github.com/nginx/nginx/releases/tag/release-1.28.3"
+      },
+      {
+        "tag": "release-1.28.2",
+        "version": "1.28.2",
+        "published_at": "2026-02-04",
+        "url": "https://github.com/nginx/nginx/releases/tag/release-1.28.2"
+      },
+      {
+        "tag": "release-1.28.1",
+        "version": "1.28.1",
+        "published_at": "2025-12-23",
+        "url": "https://github.com/nginx/nginx/releases/tag/release-1.28.1"
+      },
+      {
+        "tag": "release-1.28.0",
+        "version": "1.28.0",
+        "published_at": "2025-04-24",
+        "url": "https://github.com/nginx/nginx/releases/tag/release-1.28.0"
+      },
+      {
+        "tag": "release-1.27.5",
+        "version": "1.27.5",
+        "published_at": "2025-04-16",
+        "url": "https://github.com/nginx/nginx/releases/tag/release-1.27.5"
+      },
+      {
+        "tag": "release-1.27.4",
+        "version": "1.27.4",
+        "published_at": "2025-02-05",
+        "url": "https://github.com/nginx/nginx/releases/tag/release-1.27.4"
+      },
+      {
+        "tag": "release-1.27.3",
+        "version": "1.27.3",
+        "published_at": "2024-11-26",
+        "url": "https://github.com/nginx/nginx/releases/tag/release-1.27.3"
+      },
+      {
+        "tag": "release-1.27.2",
+        "version": "1.27.2",
+        "published_at": "2024-10-29",
+        "url": "https://github.com/nginx/nginx/releases/tag/release-1.27.2"
+      },
+      {
+        "tag": "release-1.26.3",
+        "version": "1.26.3",
+        "published_at": "2025-02-05",
+        "url": "https://github.com/nginx/nginx/releases/tag/release-1.26.3"
+      }
+    ],
+    "branch_patches": {
+      "1.31": {
+        "version": "1.31.5",
+        "release_date": "2026-09-02",
+        "eol": false
+      },
+      "1.30": {
+        "version": "1.30.4",
+        "release_date": "2026-07-15",
+        "eol": false
+      },
+      "1.26": {
+        "version": "1.26.3",
+        "release_date": "2025-08-15",
+        "eol": true
+      },
+      "1.29": {
+        "version": "1.29.8",
+        "release_date": "2026-04-07",
+        "eol": false
+      },
+      "1.28": {
+        "version": "1.28.3",
+        "release_date": "2026-03-24",
+        "eol": false
+      },
+      "1.27": {
+        "version": "1.27.5",
+        "release_date": "2025-04-16",
+        "eol": false
+      }
+    },
+    "last_checked": "2026-09-14T10:00:27.163Z"
+  },
+  "openssl": {
+    "software_key": "openssl",
+    "aliases": [
+      "openssl",
+      "libssl"
+    ],
+    "canonical_name": "OpenSSL Cryptographic Toolkit",
+    "source_type": "github",
+    "repo": "openssl/openssl",
+    "source_url": "https://github.com/openssl/openssl/releases",
+    "latest_market_version": "4.0.2",
+    "market_release_date": "2026-08-25",
+    "releases": [
+      {
+        "tag": "openssl-4.0.2",
+        "version": "4.0.2",
+        "published_at": "2026-08-25",
+        "url": "https://github.com/openssl/openssl/releases/tag/openssl-4.0.2"
+      },
+      {
+        "tag": "openssl-4.0.1",
+        "version": "4.0.1",
+        "published_at": "2026-06-09",
+        "url": "https://github.com/openssl/openssl/releases/tag/openssl-4.0.1"
+      },
+      {
+        "tag": "openssl-4.0.0",
+        "version": "4.0.0",
+        "published_at": "2026-04-14",
+        "url": "https://github.com/openssl/openssl/releases/tag/openssl-4.0.0"
+      },
+      {
+        "tag": "openssl-3.6.4",
+        "version": "3.6.4",
+        "published_at": "2026-08-25",
+        "url": "https://github.com/openssl/openssl/releases/tag/openssl-3.6.4"
+      },
+      {
+        "tag": "openssl-3.6.3",
+        "version": "3.6.3",
+        "published_at": "2026-06-09",
+        "url": "https://github.com/openssl/openssl/releases/tag/openssl-3.6.3"
+      },
+      {
+        "tag": "openssl-3.6.2",
+        "version": "3.6.2",
+        "published_at": "2026-04-07",
+        "url": "https://github.com/openssl/openssl/releases/tag/openssl-3.6.2"
+      },
+      {
+        "tag": "openssl-3.6.1",
+        "version": "3.6.1",
+        "published_at": "2026-01-27",
+        "url": "https://github.com/openssl/openssl/releases/tag/openssl-3.6.1"
+      },
+      {
+        "tag": "openssl-3.6.0",
+        "version": "3.6.0",
+        "published_at": "2025-10-01",
+        "url": "https://github.com/openssl/openssl/releases/tag/openssl-3.6.0"
+      },
+      {
+        "tag": "openssl-3.5.8",
+        "version": "3.5.8",
+        "published_at": "2026-08-25",
+        "url": "https://github.com/openssl/openssl/releases/tag/openssl-3.5.8"
+      },
+      {
+        "tag": "openssl-3.5.7",
+        "version": "3.5.7",
+        "published_at": "2026-06-09",
+        "url": "https://github.com/openssl/openssl/releases/tag/openssl-3.5.7"
+      },
+      {
+        "tag": "openssl-3.5.6",
+        "version": "3.5.6",
+        "published_at": "2026-04-07",
+        "url": "https://github.com/openssl/openssl/releases/tag/openssl-3.5.6"
+      },
+      {
+        "tag": "openssl-3.5.5",
+        "version": "3.5.5",
+        "published_at": "2026-01-27",
+        "url": "https://github.com/openssl/openssl/releases/tag/openssl-3.5.5"
+      },
+      {
+        "tag": "openssl-3.5.4",
+        "version": "3.5.4",
+        "published_at": "2025-09-30",
+        "url": "https://github.com/openssl/openssl/releases/tag/openssl-3.5.4"
+      },
+      {
+        "tag": "openssl-3.4.7",
+        "version": "3.4.7",
+        "published_at": "2026-08-25",
+        "url": "https://github.com/openssl/openssl/releases/tag/openssl-3.4.7"
+      },
+      {
+        "tag": "openssl-3.4.6",
+        "version": "3.4.6",
+        "published_at": "2026-06-09",
+        "url": "https://github.com/openssl/openssl/releases/tag/openssl-3.4.6"
+      },
+      {
+        "tag": "openssl-3.4.5",
+        "version": "3.4.5",
+        "published_at": "2026-04-07",
+        "url": "https://github.com/openssl/openssl/releases/tag/openssl-3.4.5"
+      },
+      {
+        "tag": "openssl-3.4.4",
+        "version": "3.4.4",
+        "published_at": "2026-01-27",
+        "url": "https://github.com/openssl/openssl/releases/tag/openssl-3.4.4"
+      },
+      {
+        "tag": "openssl-3.4.3",
+        "version": "3.4.3",
+        "published_at": "2025-09-30",
+        "url": "https://github.com/openssl/openssl/releases/tag/openssl-3.4.3"
+      },
+      {
+        "tag": "openssl-3.3.7",
+        "version": "3.3.7",
+        "published_at": "2026-04-07",
+        "url": "https://github.com/openssl/openssl/releases/tag/openssl-3.3.7"
+      },
+      {
+        "tag": "openssl-3.3.6",
+        "version": "3.3.6",
+        "published_at": "2026-01-27",
+        "url": "https://github.com/openssl/openssl/releases/tag/openssl-3.3.6"
+      },
+      {
+        "tag": "openssl-3.3.5",
+        "version": "3.3.5",
+        "published_at": "2025-09-30",
+        "url": "https://github.com/openssl/openssl/releases/tag/openssl-3.3.5"
+      },
+      {
+        "tag": "openssl-3.2.6",
+        "version": "3.2.6",
+        "published_at": "2025-09-30",
+        "url": "https://github.com/openssl/openssl/releases/tag/openssl-3.2.6"
+      },
+      {
+        "tag": "openssl-3.0.22",
+        "version": "3.0.22",
+        "published_at": "2026-08-25",
+        "url": "https://github.com/openssl/openssl/releases/tag/openssl-3.0.22"
+      },
+      {
+        "tag": "openssl-3.0.21",
+        "version": "3.0.21",
+        "published_at": "2026-06-09",
+        "url": "https://github.com/openssl/openssl/releases/tag/openssl-3.0.21"
+      },
+      {
+        "tag": "openssl-3.0.20",
+        "version": "3.0.20",
+        "published_at": "2026-04-07",
+        "url": "https://github.com/openssl/openssl/releases/tag/openssl-3.0.20"
+      },
+      {
+        "tag": "openssl-3.0.19",
+        "version": "3.0.19",
+        "published_at": "2026-01-27",
+        "url": "https://github.com/openssl/openssl/releases/tag/openssl-3.0.19"
+      },
+      {
+        "tag": "openssl-3.0.18",
+        "version": "3.0.18",
+        "published_at": "2025-09-30",
+        "url": "https://github.com/openssl/openssl/releases/tag/openssl-3.0.18"
+      }
+    ],
+    "branch_patches": {
+      "4.0": {
+        "version": "4.0.2",
+        "release_date": "2026-08-25",
+        "eol": false
+      },
+      "3.6": {
+        "version": "3.6.4",
+        "release_date": "2026-08-25",
+        "eol": false
+      },
+      "3.5": {
+        "version": "3.5.8",
+        "release_date": "2026-08-25",
+        "eol": false
+      },
+      "3.4": {
+        "version": "3.4.7",
+        "release_date": "2026-08-25",
+        "eol": false
+      },
+      "3.0": {
+        "version": "3.0.22",
+        "release_date": "2026-08-25",
+        "eol": true
+      },
+      "3.3": {
+        "version": "3.3.7",
+        "release_date": "2026-04-07",
+        "eol": false
+      },
+      "3.2": {
+        "version": "3.2.6",
+        "release_date": "2025-09-30",
+        "eol": false
+      }
+    },
+    "last_checked": "2026-09-14T10:00:27.151Z"
+  },
+  "tomcat": {
+    "software_key": "tomcat",
+    "aliases": [
+      "tomcat",
+      "apache tomcat",
+      "catalina"
+    ],
+    "canonical_name": "Apache Tomcat",
+    "source_type": "static",
+    "source_url": "https://tomcat.apache.org/",
+    "latest_market_version": "11.0.26",
+    "market_release_date": "2026-08-20",
+    "releases": [
+      {
+        "tag": "11.0.26",
+        "version": "11.0.26",
+        "published_at": "2026-08-20",
+        "url": "https://tomcat.apache.org/"
+      }
+    ],
+    "branch_patches": {
+      "11.0": {
+        "version": "11.0.26",
+        "release_date": "2026-08-20",
+        "eol": false
+      },
+      "10.1": {
+        "version": "10.1.34",
+        "release_date": "2026-07-15",
+        "eol": false
+      },
+      "9.0": {
+        "version": "9.0.98",
+        "release_date": "2026-06-10",
+        "eol": false
+      }
+    }
+  },
+  "python": {
+    "software_key": "python",
+    "aliases": [
+      "python",
+      "cpython",
+      "python3"
+    ],
+    "canonical_name": "Python Runtime",
+    "source_type": "github",
+    "repo": "python/cpython",
+    "source_url": "https://www.python.org/downloads/",
+    "latest_market_version": "3.14.2",
+    "market_release_date": "2026-08-15",
+    "releases": [
+      {
+        "tag": "v3.14.2",
+        "version": "3.14.2",
+        "published_at": "2026-08-15",
+        "url": "https://www.python.org/downloads/"
+      }
+    ],
+    "branch_patches": {
+      "3.14": {
+        "version": "3.14.2",
+        "release_date": "2026-08-15",
+        "eol": false
+      },
+      "3.13": {
+        "version": "3.13.5",
+        "release_date": "2026-07-10",
+        "eol": false
+      },
+      "3.12": {
+        "version": "3.12.9",
+        "release_date": "2026-05-20",
+        "eol": false
+      }
+    }
+  },
+  "ubuntu": {
+    "software_key": "ubuntu",
+    "aliases": [
+      "ubuntu",
+      "ubuntu linux",
+      "canonical ubuntu"
+    ],
+    "canonical_name": "Ubuntu Linux",
+    "source_type": "static",
+    "source_url": "https://ubuntu.com/about/release-cycle",
+    "latest_market_version": "24.04.2 LTS",
+    "market_release_date": "2025-02-20",
+    "releases": [],
+    "branch_patches": {
+      "24.04": {
+        "version": "24.04.2 LTS",
+        "release_date": "2025-02-20",
+        "eol": false
+      },
+      "22.04": {
+        "version": "22.04.5 LTS",
+        "release_date": "2024-09-12",
+        "eol": false
+      },
+      "20.04": {
+        "version": "20.04.6 LTS",
+        "release_date": "2023-03-23",
+        "eol": true
+      }
+    }
+  }
+}
