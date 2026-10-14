@@ -23,6 +23,10 @@ This guide walks you through migrating and hosting this codebase in **Azure DevO
 
 ---
 
+> ℹ️ **Firewall & Network Allowlist Prerequisite**: If your build agents, VMs, or AKS cluster nodes run within a restricted corporate network or behind a proxy, review the required egress domains (Azure DevOps, ACR, MCR, AKS API server, npm, apt, and PyPI) in the **[README.md Network Requirements](./README.md#-network-firewall--url-allowlist-requirements-enterprise--cloud-vm)**.
+
+---
+
 ## 2. Step-by-Step Instructions
 
 ### Step 1: Push Code to Azure DevOps Repo

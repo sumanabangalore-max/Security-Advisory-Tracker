@@ -64,6 +64,8 @@ The advisory panel features deep, contextual intelligence powered by generative 
 
 ---
 
+## 🚀 Getting Started: Local Docker Deployment
+
 Follow these steps to build, run, and test the system locally using Docker Desktop:
 
 ### Prerequisites
@@ -100,6 +102,120 @@ To stop containers and completely wipe all Postgres data (starting fresh):
 ```bash
 docker compose down -v
 ```
+
+---
+
+## 🌐 Network, Firewall & URL Allowlist Requirements (Enterprise / Cloud VM)
+
+When deploying or building this system for the first time inside an **Enterprise VM, Virtual Private Cloud (VPC), or restricted corporate network**, outbound Internet egress is typically blocked by default. 
+
+If any required endpoints are blocked by a corporate firewall or proxy, Docker builds will fail with errors such as:
+* **`apt-get update ... exit code: 100`** (unable to resolve or reach Debian package mirrors)
+* **`npm ci ... exit code: 1`** or `ETIMEDOUT` / socket hangup (unable to reach the NPM registry)
+* **`pip install ... ConnectionError`** (unable to reach PyPI package CDNs)
+* **`az acr login` or `docker push ... dial tcp timeout`** (unable to reach ACR or underlying Azure Blob Storage)
+
+Provide the following URL allowlists to your **Network / Security / Firewall Team** before initial deployment:
+
+### 1. Master Allowlist Table for Network & Security Administrators
+
+| Category | Domain / FQDN | Port | Protocol | Purpose / Component |
+| :--- | :--- | :--- | :--- | :--- |
+| **Docker Engine** | `registry-1.docker.io` | `443` | TCP / HTTPS | Docker Hub registry manifest queries |
+| **Docker Engine** | `auth.docker.io` | `443` | TCP / HTTPS | Docker Hub authentication and token service |
+| **Docker Engine** | `production.cloudflare.docker.com` | `443` | TCP / HTTPS | Docker Hub image blob layer downloads |
+| **OS Packages** | `dl-cdn.alpinelinux.org` | `80, 443` | TCP / HTTP(S) | Alpine Linux `apk` packages (frontend container) |
+| **OS Packages** | `deb.debian.org` | `80, 443` | TCP / HTTP(S) | Debian package repositories (Python backend & worker) |
+| **OS Packages** | `security.debian.org` | `80, 443` | TCP / HTTP(S) | Debian security updates and patches |
+| **OS Packages** | `ftp.debian.org` | `80, 443` | TCP / HTTP(S) | Debian mirror fallback |
+| **Package Manager** | `registry.npmjs.org` | `443` | TCP / HTTPS | Node.js / NPM packages for frontend & Express backend |
+| **Package Manager** | `*.npmjs.org` | `443` | TCP / HTTPS | NPM package CDNs and asset downloads |
+| **Package Manager** | `pypi.org` | `443` | TCP / HTTPS | Python Package Index (FastAPI backend & worker) |
+| **Package Manager** | `files.pythonhosted.org` | `443` | TCP / HTTPS | PyPI wheel and tarball download CDN |
+| **Azure DevOps** | `dev.azure.com` | `443` | TCP / HTTPS | Azure DevOps Git repos and web portal |
+| **Azure DevOps** | `*.visualstudio.com` | `443` | TCP / HTTPS | Azure DevOps build pipeline agents & APIs |
+| **Azure DevOps** | `*.vsassets.io` | `443` | TCP / HTTPS | Azure DevOps pipeline task extensions & artifacts |
+| **Azure Auth & ARM** | `login.microsoftonline.com` | `443` | TCP / HTTPS | Azure Entra ID / Active Directory authentication |
+| **Azure Auth & ARM** | `management.azure.com` | `443` | TCP / HTTPS | Azure Resource Manager (ARM) API |
+| **Azure ACR** | `<your-acr-name>.azurecr.io` | `443` | TCP / HTTPS | Azure Container Registry login & push/pull endpoints |
+| **Azure ACR Storage** | `*.blob.core.windows.net` | `443` | TCP / HTTPS | Azure Blob Storage backing ACR image layers (required for push/pull) |
+| **Microsoft MCR** | `mcr.microsoft.com` | `443` | TCP / HTTPS | Microsoft Container Registry (system base images) |
+| **Microsoft MCR** | `*.data.mcr.microsoft.com` | `443` | TCP / HTTPS | Microsoft Container Registry image blobs |
+| **AKS Cluster** | `<cluster-name>.<region>.azmk8s.io` | `443` | TCP / HTTPS | AKS Kubernetes API Server control plane |
+| **Threat Intelligence** | `services.nvd.nist.gov` | `443` | TCP / HTTPS | NIST National Vulnerability Database API 2.0 (Worker) |
+| **Threat Intelligence** | `cve.mitre.org` | `443` | TCP / HTTPS | MITRE CVE dictionary and references |
+| **Threat Intelligence** | `api.github.com` | `443` | TCP / HTTPS | GitHub Security Advisory Database feed |
+| **Generative AI** | `generativelanguage.googleapis.com` | `443` | TCP / HTTPS | Google Gemini API (AI Patching Agent & zero-day advisories) |
+
+---
+
+### 2. Deep-Dive by Deployment Phase
+
+#### A. Initial Build Phase (VM or Self-Hosted CI Runner)
+When running `docker compose up --build` or executing `docker build`:
+* **Docker Hub**: Requires access to pull `node:20-alpine`, `python:3.11-slim`, and `postgres:16-alpine`.
+* **Alpine & Debian Mirrors**:
+  * `dl-cdn.alpinelinux.org`
+  * `deb.debian.org`, `security.debian.org`, `ftp.debian.org`
+* **Node & Python Registries**:
+  * `registry.npmjs.org`
+  * `pypi.org` and `files.pythonhosted.org`
+
+#### B. CI/CD & Azure Cloud Deployment (AzDO -> ACR -> AKS)
+When building via Azure DevOps pipelines and pushing to ACR / AKS:
+* **Azure DevOps**: `dev.azure.com`, `*.visualstudio.com`, `*.vsassets.io`
+* **Azure Container Registry**: `<your-acr-name>.azurecr.io` and `*.blob.core.windows.net` (*Note*: Docker layers in ACR are stored in Azure Blob Storage; blocking blob storage results in hanging pushes).
+* **AKS Cluster Management**: Management endpoints `management.azure.com` and your cluster API server `*.azmk8s.io`.
+
+#### C. Runtime Threat Feeds & AI Assistant
+When containers are actively running in production:
+* **Background Worker**: Queries `services.nvd.nist.gov` to sync CVE records and CVSS v3.1 scores.
+* **AI Security Agent**: Queries `generativelanguage.googleapis.com` using `GEMINI_API_KEY` for dynamic zero-day patch scripts, container workarounds, and incident playbooks.
+
+---
+
+### 3. Corporate VM & Proxy Troubleshooting
+
+If your corporate VM sits behind a forward proxy or uses private corporate DNS servers, follow these configurations:
+
+#### 1. Configuring DNS for Docker Containers (`/etc/docker/daemon.json`)
+If containers fail with `Temporary failure in name resolution` or `exit code: 100`:
+```json
+{
+  "dns": ["8.8.8.8", "1.1.1.1"]
+}
+```
+*Apply change:*
+```bash
+sudo systemctl restart docker
+```
+
+#### 2. Building Containers Behind an HTTP/HTTPS Proxy
+If your VM requires a corporate proxy to reach the internet, pass proxy arguments to Docker:
+```bash
+docker compose build \
+  --build-arg HTTP_PROXY="http://proxy.company.internal:8080" \
+  --build-arg HTTPS_PROXY="http://proxy.company.internal:8080" \
+  --build-arg NO_PROXY="localhost,127.0.0.1,postgres,backend,worker"
+```
+
+Or configure Docker client globally in `~/.docker/config.json`:
+```json
+{
+  "proxies": {
+    "default": {
+      "httpProxy": "http://proxy.company.internal:8080",
+      "httpsProxy": "http://proxy.company.internal:8080",
+      "noProxy": "localhost,127.0.0.1,postgres,backend,worker"
+    }
+  }
+}
+```
+
+#### 3. Handling SSL / TLS Decryption & Custom Corporate CA Certificates
+If your firewall performs TLS deep packet inspection (DPI), `npm ci` and `pip install` may reject corporate certificates:
+* **For NPM / Node**: Set `NODE_EXTRA_CA_CERTS=/path/to/corporate-ca.crt` or pass it as a Docker build secret.
+* **For Python Pip**: Use `pip install --cert /path/to/corporate-ca.crt -r requirements.txt`.
 
 ---
 
@@ -173,4 +289,15 @@ docker push <your_acr_name>.azurecr.io/cve-tracker-frontend:latest
 4. Deploy the **Worker background container app** (ingress disabled).
 
 ---
+
+### 3. Deploying to Azure Kubernetes Service (AKS) via Azure DevOps & ACR
+
+For enterprise production deployments utilizing **Azure DevOps Repos**, CI/CD Pipelines, **Azure Container Registry (ACR)**, and **Azure Kubernetes Service (AKS)**, a dedicated, comprehensive deployment guide and ready-to-deploy Kubernetes manifests are included in this repository:
+
+* 📖 **Comprehensive Guide**: [AZURE_DEVOPS_AKS_GUIDE.md](./AZURE_DEVOPS_AKS_GUIDE.md)
+* ⚙️ **CI/CD Pipeline Definition**: [azure-pipelines.yml](./azure-pipelines.yml)
+* ☸️ **Kubernetes Manifests**: Located in the [k8s/](./k8s/) directory (Deployment, Service, Ingress, and ConfigMaps).
+
+---
+
 
