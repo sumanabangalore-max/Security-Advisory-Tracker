@@ -1,0 +1,100 @@
+# Azure DevOps Multi-Stage Pipeline: Build Docker Image, Push to ACR, and Deploy to AKS
+trigger:
+  branches:
+    include:
+      - main
+      - master
+
+variables:
+  # -------------------------------------------------------------
+  # Adjust these variable names to match your Azure DevOps setup:
+  # -------------------------------------------------------------
+  # Name of your Docker Registry Service Connection in Azure DevOps
+  dockerRegistryServiceConnection: 'acr-service-connection'
+  # Fully qualified login server of your Azure Container Registry (e.g. myacr.azurecr.io)
+  containerRegistry: 'mysecadvisoracr.azurecr.io'
+  # Image name
+  imageRepository: 'sec-advisor'
+  # Dockerfile location
+  dockerfilePath: '$(Build.SourcesDirectory)/Dockerfile'
+  # Unique tag for the container image
+  tag: '$(Build.BuildId)'
+  # Target namespace in AKS
+  k8sNamespace: 'sec-advisor'
+  # Kubernetes Service Connection in Azure DevOps targeting your AKS cluster
+  kubernetesServiceConnection: 'aks-service-connection'
+
+pool:
+  vmImage: 'ubuntu-latest'
+
+stages:
+  # ---------------------------------------------------------------------------
+  # STAGE 1: Build Container & Push to Azure Container Registry (ACR)
+  # ---------------------------------------------------------------------------
+  - stage: BuildAndPush
+    displayName: 'Build and Push to ACR'
+    jobs:
+      - job: Build
+        displayName: 'Docker Build & Push'
+        steps:
+          - task: Docker@2
+            displayName: 'Build Docker Image & Push to ACR'
+            inputs:
+              command: buildAndPush
+              repository: $(imageRepository)
+              dockerfile: $(dockerfilePath)
+              containerRegistry: $(dockerRegistryServiceConnection)
+              tags: |
+                $(tag)
+                latest
+
+          - task: PublishPipelineArtifact@1
+            displayName: 'Publish Kubernetes Manifests Artifact'
+            inputs:
+              targetPath: '$(Build.SourcesDirectory)/k8s'
+              artifact: 'manifests'
+              publishLocation: 'pipeline'
+
+  # ---------------------------------------------------------------------------
+  # STAGE 2: Deploy Application to Azure Kubernetes Service (AKS)
+  # ---------------------------------------------------------------------------
+  - stage: DeployToAKS
+    displayName: 'Deploy to AKS'
+    dependsOn: BuildAndPush
+    condition: succeeded()
+    jobs:
+      - deployment: Deploy
+        displayName: 'Deploy to Kubernetes Cluster'
+        environment: 'production.sec-advisor'
+        strategy:
+          runOnce:
+            deploy:
+              steps:
+                - download: current
+                  artifact: manifests
+                  displayName: 'Download Kubernetes Manifests'
+
+                # Replace image placeholder in deployment.yaml with actual ACR image & build tag
+                - task: Bash@3
+                  displayName: 'Substitute Image Tag in Manifests'
+                  inputs:
+                    targetType: 'inline'
+                    script: |
+                      IMAGE_FULL="$(containerRegistry)/$(imageRepository):$(tag)"
+                      echo "Updating deployment image to: $IMAGE_FULL"
+                      sed -i "s|#{ACR_LOGIN_SERVER}#/sec-advisor:#{BUILD_BUILDID}#|$IMAGE_FULL|g" $(Pipeline.Workspace)/manifests/deployment.yaml
+                      cat $(Pipeline.Workspace)/manifests/deployment.yaml
+
+                # Deploy manifests to AKS
+                - task: KubernetesManifest@1
+                  displayName: 'Deploy Manifests to AKS'
+                  inputs:
+                    action: 'deploy'
+                    connectionType: 'kubernetesServiceConnection'
+                    kubernetesServiceConnection: $(kubernetesServiceConnection)
+                    namespace: $(k8sNamespace)
+                    manifests: |
+                      $(Pipeline.Workspace)/manifests/namespace.yaml
+                      $(Pipeline.Workspace)/manifests/deployment.yaml
+                      $(Pipeline.Workspace)/manifests/service.yaml
+                      $(Pipeline.Workspace)/manifests/ingress.yaml

@@ -1,0 +1,6 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: sec-advisor
+  labels:
+    app.kubernetes.io/name: sec-advisor

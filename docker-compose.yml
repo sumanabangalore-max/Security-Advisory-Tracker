@@ -22,6 +22,7 @@ services:
     build:
       context: ./backend
       dockerfile: Dockerfile
+      network: host
     container_name: cve-tracker-bootstrap
     depends_on:
       postgres:
@@ -37,6 +38,7 @@ services:
     build:
       context: ./backend
       dockerfile: Dockerfile
+      network: host
     container_name: cve-tracker-api
     ports:
       - "8000:8000"
@@ -58,6 +60,7 @@ services:
     build:
       context: ./backend
       dockerfile: Dockerfile
+      network: host
     container_name: cve-tracker-worker
     depends_on:
       postgres:
@@ -75,6 +78,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
+      network: host
     container_name: cve-tracker-ui
     ports:
       - "3000:3000"

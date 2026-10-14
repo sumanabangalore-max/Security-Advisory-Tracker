@@ -23,8 +23,9 @@ WORKDIR /app
 COPY package*.json ./
 RUN npm ci --omit=dev || npm install --omit=dev
 
-# Copy built files
+# Copy built files and persistent inventory seed data
 COPY --from=builder /app/dist ./dist
+COPY --from=builder /app/inventory ./inventory
 
 # Expose port 3000 (standard port for the server.ts Express endpoint)
 EXPOSE 3000
