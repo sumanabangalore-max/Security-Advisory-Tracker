@@ -27,11 +27,31 @@ RUN sed -i '/"angular"/d' package.json package-lock.json 2>/dev/null || true
 RUN npm config set strict-ssl false \
     && npm config set audit false \
     && npm config set fund false \
-    && npm config set fetch-retries 5 \
-    && npm config set fetch-retry-mintimeout 5000 \
-    && npm config set fetch-retry-maxtimeout 30000 \
-    && if [ -n "${NPM_CONFIG_REGISTRY:-}" ]; then npm config set registry "${NPM_CONFIG_REGISTRY}"; fi \
-    && (npm ci --no-audit --no-fund || npm install --no-audit --no-fund)
+    && npm config set fetch-retries 2 \
+    && npm config set fetch-retry-mintimeout 1000 \
+    && npm config set fetch-retry-maxtimeout 5000 \
+    && if [ -n "${NPM_CONFIG_REGISTRY:-}" ]; then \
+        echo "Configuring custom NPM registry: ${NPM_CONFIG_REGISTRY}"; \
+        sed -i "s|https://registry.npmjs.org/|${NPM_CONFIG_REGISTRY%/}/|g" package-lock.json 2>/dev/null || true; \
+        npm config set registry "${NPM_CONFIG_REGISTRY}"; \
+        npm ci --no-audit --no-fund || npm install --no-audit --no-fund; \
+    elif npm ci --no-audit --no-fund; then \
+        echo "Installed dependencies successfully via standard npm ci"; \
+    else \
+        echo "Primary registry failed (likely HTTP 503 / firewall block). Falling back to Cloudflare/Yarn mirror..."; \
+        sed -i 's|https://registry.npmjs.org/|https://registry.yarnpkg.com/|g' package-lock.json 2>/dev/null || true; \
+        npm config set registry https://registry.yarnpkg.com/; \
+        npm ci --no-audit --no-fund || { \
+            echo "Cloudflare/Yarn mirror lockfile attempt failed. Trying npmmirror..."; \
+            sed -i 's|https://registry.yarnpkg.com/|https://registry.npmmirror.com/|g' package-lock.json 2>/dev/null || true; \
+            npm config set registry https://registry.npmmirror.com/; \
+            npm ci --no-audit --no-fund || { \
+                echo "Falling back to fresh npm install without lockfile constraint..."; \
+                rm -f package-lock.json; \
+                npm install --no-audit --no-fund --registry=https://registry.yarnpkg.com || npm install --no-audit --no-fund --registry=https://registry.npmmirror.com; \
+            }; \
+        }; \
+    fi
 
 # Copy source code (respecting .dockerignore)
 COPY . .

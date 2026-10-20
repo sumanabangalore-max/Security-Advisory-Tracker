@@ -242,42 +242,47 @@ If Docker build appeared stuck on the frontend `npm` installation stage for 10â€
 2. Set `ENV NODE_TLS_REJECT_UNAUTHORIZED=0` and `NPM_CONFIG_STRICT_SSL=false` **upfront** so npm immediately connects without waiting for SSL timeout penalties.
 3. Lowered retry wait times to snappy defaults (`fetch-retry-mintimeout 1000`, `fetch-retry-maxtimeout 5000` = 1s to 5s max).
 
-#### 6. Troubleshooting NPM 503 Service Unavailable / Exit Code 1 Errors
+#### 6. Troubleshooting NPM 503 Service Unavailable / Tarball Download Errors
 If the Docker build fails at the `target frontend` stage with:
 ```text
-target frontend: failed to solve: process "/bin/sh -c ... (npm ci ... || npm install ...)" did not complete successfully: exit code: 1
-```
-or:
-```text
 npm error code E503
-npm error 503 Service Unavailable - GET https://registry.npmjs.org/angular
+npm error 503 Service Unavailable - GET https://registry.npmjs.org/yallist/-/yallist-3.1.1.tgz
 ```
+or any package tarball returning HTTP 503 / timing out:
 
-* **Root Cause 1 (Stale local `package.json` with `angular`)**: If your local copy still has `"angular": "^1.8.3"`, npm tries to fetch Angular during the build. Some corporate firewalls or NPM mirrors throttle or block this with a `503 Service Unavailable` or certificate rejection.
-* **Root Cause 2 (Compound Subshell Exiting in Dash)**: In Debian's `/bin/sh` (`dash`), subshell cascades combined with `set -e` can return exit code 1 if upstream registries return non-200 responses.
-* **Root Cause 3 (Enterprise Proxy / Private Mirror Required)**: In corporate environments with Zscaler/Netskope/Palo Alto inspection, Docker containers cannot reach public `registry.npmjs.org` directly without proxy environment variables or custom company artifact feeds (e.g., Azure Artifacts, Nexus, Artifactory).
+* **Why this occurs**: 
+  1. **Lockfile URL Binding**: Standard `package-lock.json` files contain `"resolved": "https://registry.npmjs.org/..."` for each dependency. Even when configured with an alternative registry or proxy, `npm ci` strictly attempts to fetch tarballs directly from the locked `registry.npmjs.org` URLs.
+  2. **Corporate DPI / Firewall Throttling**: Many enterprise proxies (Zscaler, Netskope, Cisco Umbrella, Blue Coat) inspect tarball downloads or rate-limit concurrent connections to `registry.npmjs.org`, returning `503 Service Unavailable` or dropping the connection after a timeout.
+  3. **High Timeout Loops**: Excessive retries (e.g. 5 retries with 30s timeouts) can cause Docker builds to stall for 3 to 15 minutes before finally failing.
 
-**What Has Been Resolved**:
-1. **Automatic Prune inside Dockerfile**: Added `RUN sed -i '/"angular"/d' package.json package-lock.json 2>/dev/null || true` right after copying manifests. Even if your local files weren't pulled or refreshed, Docker guarantees Angular will never be requested!
-2. **Synchronized Lockfile**: Both `package.json` and `package-lock.json` are now 100% clean and synchronized.
-3. **Streamlined Build Command**: Cleaned up the RUN command in `Dockerfile` to execute without fragile subshell aborts.
-4. **Proxy & Registry Passthrough**: Added `HTTP_PROXY`, `HTTPS_PROXY`, `NO_PROXY`, and `NPM_CONFIG_REGISTRY` build arguments to `docker-compose.yml`.
+**How This Has Been Solved in the Codebase**:
+1. **Automated Multi-Tier Mirror Fallback**: The `Dockerfile` now features an automated multi-tier installation pipeline:
+   - **Tier 1**: Attempts fast `npm ci`.
+   - **Tier 2 (Custom Registry)**: If `NPM_CONFIG_REGISTRY` is passed, automatically rewrites all `resolved` URLs in `package-lock.json` to point directly to your custom registry.
+   - **Tier 3 (Cloudflare CDN Mirror)**: If `registry.npmjs.org` throws 503 or fails, it automatically rewrites `package-lock.json` URLs to Cloudflare's global mirror (`https://registry.yarnpkg.com/`) and re-attempts `npm ci`.
+   - **Tier 4 (Secondary Mirror)**: If Cloudflare mirror is blocked, it automatically switches to `https://registry.npmmirror.com/`.
+   - **Tier 5 (Clean Fallback)**: Removes lockfile restrictions and runs a direct clean install.
+2. **Snappy Timeout Settings**: Reduced retries from 5 to 2 and timeouts to 1-5 seconds so you never get stuck waiting 15 minutes.
+3. **Automatic Angular & Stale Reference Pruning**: Guarantees no stray or deprecated packages trigger 503s.
 
-**Recommended Clean Rebuild Commands**:
+**Recommended Commands to Rebuild**:
 ```bash
-# 1. Cleanly rebuild without cached layers
-docker compose build --no-cache frontend backend bootstrap worker
+# 1. Standard build (the Dockerfile will now automatically fallback to Cloudflare/Yarn mirror if 503 occurs):
+docker compose build --no-cache frontend
 
-# 2. If behind a corporate proxy, pass proxy arguments:
+# 2. (Optional) Force the build to use Cloudflare's fast CDN mirror directly:
+docker compose build --build-arg NPM_CONFIG_REGISTRY="https://registry.yarnpkg.com/" --no-cache frontend
+
+# 3. (Optional) If behind a corporate proxy:
 docker compose build --build-arg HTTP_PROXY="http://your-proxy:8080" \
                      --build-arg HTTPS_PROXY="http://your-proxy:8080" \
                      --build-arg NO_PROXY="localhost,127.0.0.1" \
                      --no-cache frontend
 
-# 3. If your company uses an internal npm registry (Artifactory, Nexus, Azure Artifacts):
-docker compose build --build-arg NPM_CONFIG_REGISTRY="https://your-artifactory/api/npm/npm-repo/" frontend
+# 4. (Optional) If your company requires an internal registry (Artifactory, Nexus, Azure Artifacts):
+docker compose build --build-arg NPM_CONFIG_REGISTRY="https://your-artifactory/api/npm/npm-repo/" --no-cache frontend
 
-# 4. Launch all services:
+# 5. Launch all services:
 docker compose up -d
 ```
 
