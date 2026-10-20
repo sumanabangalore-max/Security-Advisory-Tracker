@@ -242,14 +242,27 @@ If Docker build appeared stuck on the frontend `npm` installation stage for 10â€
 2. Set `ENV NODE_TLS_REJECT_UNAUTHORIZED=0` and `NPM_CONFIG_STRICT_SSL=false` **upfront** so npm immediately connects without waiting for SSL timeout penalties.
 3. Lowered retry wait times to snappy defaults (`fetch-retry-mintimeout 1000`, `fetch-retry-maxtimeout 5000` = 1s to 5s max).
 
-**Recommended Clean Rebuild Command on Docker Desktop**:
-```bash
-# 1. Cancel the stuck command in your terminal using Ctrl+C
+#### 6. Troubleshooting NPM 503 Service Unavailable Errors (e.g., `GET https://registry.npmjs.org/angular`)
+If the Docker build failed with:
+```text
+npm error code E503
+npm error 503 Service Unavailable - GET https://registry.npmjs.org/angular
+```
+* **Root Cause 1 (Spurious Dependency in `package.json`)**: The project had an unneeded `"angular": "^1.8.3"` listed in `package.json` (a leftover from security vulnerability tracking test fixtures). However, `angular` was not used in the application.
+* **Root Cause 2 (Lockfile Mismatch Triggering Full Resolution)**: Because `angular` was missing from `package-lock.json`, `npm ci` failed fast with `EUSAGE (out of sync)`, forcing Docker to fall back to `npm install`. That triggered full live dependency resolution against `registry.npmjs.org`, which hit corporate proxy limits or transient 503 throttling.
+* **Root Cause 3 (Corporate Proxy/Firewall 503)**: Many enterprise security appliances (Zscaler, BlueCoat, Palo Alto) return `503 Service Unavailable` when an unauthenticated internal container attempts outbound HTTPS queries to package registries without custom headers or mirrors.
 
-# 2. Rebuild the frontend and backend images cleanly:
+**What Has Been Resolved**:
+1. **Removed `angular`** from `package.json` and synchronized `package-lock.json` so all 367 dependencies are 100% locked.
+2. Updated `Dockerfile` so `npm ci` runs cleanly and deterministically in seconds directly from the verified lockfile.
+3. Added automatic fallback to mirror (`registry.npmmirror.com`) and support for enterprise registries via `ARG NPM_CONFIG_REGISTRY`.
+
+**Recommended Clean Rebuild Command**:
+```bash
+# 1. Cleanly rebuild the frontend and backend images:
 docker compose build --no-cache frontend backend bootstrap worker
 
-# 3. Launch all containers in detached mode:
+# 2. Launch all services:
 docker compose up -d
 ```
 
