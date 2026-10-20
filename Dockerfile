@@ -20,16 +20,18 @@ ENV NODE_TLS_REJECT_UNAUTHORIZED=0 \
 # Copy package manifests first to leverage Docker layer caching
 COPY package*.json ./
 
-# Fast, non-blocking npm configuration with mirror fallback if upstream registry returns 503
-RUN set -eux; \
-    npm config set strict-ssl false \
+# Automatically prune any stray angular reference if building from an older local directory
+RUN sed -i '/"angular"/d' package.json package-lock.json 2>/dev/null || true
+
+# Resilient npm configuration for corporate environments, proxies, and custom registries
+RUN npm config set strict-ssl false \
     && npm config set audit false \
     && npm config set fund false \
-    && npm config set fetch-retries 3 \
-    && npm config set fetch-retry-mintimeout 2000 \
-    && npm config set fetch-retry-maxtimeout 10000 \
+    && npm config set fetch-retries 5 \
+    && npm config set fetch-retry-mintimeout 5000 \
+    && npm config set fetch-retry-maxtimeout 30000 \
     && if [ -n "${NPM_CONFIG_REGISTRY:-}" ]; then npm config set registry "${NPM_CONFIG_REGISTRY}"; fi \
-    && (npm ci --no-audit --no-fund || npm install --no-audit --no-fund || npm install --no-audit --no-fund --registry=https://registry.npmmirror.com)
+    && (npm ci --no-audit --no-fund || npm install --no-audit --no-fund)
 
 # Copy source code (respecting .dockerignore)
 COPY . .

@@ -37,6 +37,15 @@ services:
     build:
       context: ./backend
       dockerfile: Dockerfile
+      args:
+        - HTTP_PROXY
+        - HTTPS_PROXY
+        - NO_PROXY
+        - http_proxy
+        - https_proxy
+        - no_proxy
+        - PIP_INDEX_URL
+        - PIP_TRUSTED_HOST
     container_name: cve-tracker-api
     ports:
       - "8000:8000"
@@ -75,6 +84,14 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
+      args:
+        - HTTP_PROXY
+        - HTTPS_PROXY
+        - NO_PROXY
+        - http_proxy
+        - https_proxy
+        - no_proxy
+        - NPM_CONFIG_REGISTRY
     container_name: cve-tracker-ui
     ports:
       - "3000:3000"
