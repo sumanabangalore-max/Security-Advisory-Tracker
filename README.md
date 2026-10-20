@@ -117,49 +117,83 @@ If any required endpoints are blocked by a corporate firewall or proxy, Docker b
 
 Provide the following URL allowlists to your **Network / Security / Firewall Team** before initial deployment:
 
-### 1. Master Allowlist Table for Network & Security Administrators
+### 1. Port Architecture & Firewall Inbound/Outbound Matrix
 
-| Category | Domain / FQDN | Port | Protocol | Purpose / Component |
+The system requires specific port allocations for host access, inter-container communication, and external integrations:
+
+#### A. Inbound / Listening Ports (Host & Ingress)
+| Port | Protocol | Direction | Service / Process | Access Scope | Description |
+| :--- | :--- | :--- | :--- | :--- | :--- |
+| **`3000`** | TCP / HTTP | Inbound | `cve-tracker-ui` (Full-Stack) | Analysts / Users / Web Browser | Unified Web UI Dashboard, Express API, & live WebSocket stream |
+| **`8000`** | TCP / HTTP | Inbound | `cve-tracker-api` (FastAPI) | Internal / Admins / API Clients | Python REST API and OpenAPI interactive documentation (`/docs`) |
+| **`5432`** | TCP | Inbound (Local) | `cve-tracker-db` (PostgreSQL) | Localhost / Docker containers | PostgreSQL relational database storage (exposed for DB administration) |
+| **`5173`** | TCP / HTTP | Inbound (Dev) | Vite Dev Server | Developers | Local development Vite hot-reload server (when running without Docker) |
+
+#### B. Internal Inter-Container Networking (Docker Bridge Network)
+All containers communicate privately across an isolated Docker bridge network (`cve-net` / `172.18.0.0/16`):
+* **`postgres:5432`**: Accessed exclusively by `backend` and `worker` services.
+* **`backend:8000`**: Accessed by `frontend` proxy and internal services.
+* **`127.0.0.11:53`** (UDP/TCP): Docker embedded DNS resolver for container-to-container service discovery.
+
+#### C. Optional Enterprise Integration Egress Ports (Configurable in Dashboard)
+| Port | Protocol | Direction | Destination | Feature / Purpose |
 | :--- | :--- | :--- | :--- | :--- |
-| **Docker Engine** | `registry-1.docker.io` | `443` | TCP / HTTPS | Docker Hub registry manifest queries |
-| **Docker Engine** | `auth.docker.io` | `443` | TCP / HTTPS | Docker Hub authentication and token service |
-| **Docker Engine** | `production.cloudflare.docker.com` | `443` | TCP / HTTPS | Docker Hub image blob layer downloads |
-| **OS Packages** | `dl-cdn.alpinelinux.org` | `80, 443` | TCP / HTTP(S) | Alpine Linux `apk` packages (frontend container) |
-| **OS Packages** | `deb.debian.org` | `80, 443` | TCP / HTTP(S) | Debian package repositories (Python backend & worker) |
-| **OS Packages** | `security.debian.org` | `80, 443` | TCP / HTTP(S) | Debian security updates and patches |
-| **OS Packages** | `ftp.debian.org` | `80, 443` | TCP / HTTP(S) | Debian mirror fallback |
-| **Package Manager** | `registry.npmjs.org` | `443` | TCP / HTTPS | Node.js / NPM packages for frontend & Express backend |
-| **Package Manager** | `*.npmjs.org` | `443` | TCP / HTTPS | NPM package CDNs and asset downloads |
-| **Package Manager** | `pypi.org` | `443` | TCP / HTTPS | Python Package Index (FastAPI backend & worker) |
-| **Package Manager** | `files.pythonhosted.org` | `443` | TCP / HTTPS | PyPI wheel and tarball download CDN |
-| **Azure DevOps** | `dev.azure.com` | `443` | TCP / HTTPS | Azure DevOps Git repos and web portal |
-| **Azure DevOps** | `*.visualstudio.com` | `443` | TCP / HTTPS | Azure DevOps build pipeline agents & APIs |
-| **Azure DevOps** | `*.vsassets.io` | `443` | TCP / HTTPS | Azure DevOps pipeline task extensions & artifacts |
-| **Azure Auth & ARM** | `login.microsoftonline.com` | `443` | TCP / HTTPS | Azure Entra ID / Active Directory authentication |
-| **Azure Auth & ARM** | `management.azure.com` | `443` | TCP / HTTPS | Azure Resource Manager (ARM) API |
-| **Azure ACR** | `<your-acr-name>.azurecr.io` | `443` | TCP / HTTPS | Azure Container Registry login & push/pull endpoints |
-| **Azure ACR Storage** | `*.blob.core.windows.net` | `443` | TCP / HTTPS | Azure Blob Storage backing ACR image layers (required for push/pull) |
-| **Microsoft MCR** | `mcr.microsoft.com` | `443` | TCP / HTTPS | Microsoft Container Registry (system base images) |
-| **Microsoft MCR** | `*.data.mcr.microsoft.com` | `443` | TCP / HTTPS | Microsoft Container Registry image blobs |
-| **AKS Cluster** | `<cluster-name>.<region>.azmk8s.io` | `443` | TCP / HTTPS | AKS Kubernetes API Server control plane |
-| **Threat Intelligence** | `services.nvd.nist.gov` | `443` | TCP / HTTPS | NIST National Vulnerability Database API 2.0 (Worker) |
-| **Threat Intelligence** | `cve.mitre.org` | `443` | TCP / HTTPS | MITRE CVE dictionary and references |
-| **Threat Intelligence** | `api.github.com` | `443` | TCP / HTTPS | GitHub Security Advisory Database feed |
-| **Generative AI** | `generativelanguage.googleapis.com` | `443` | TCP / HTTPS | Google Gemini API (AI Patching Agent & zero-day advisories) |
+| **`22`** | TCP | Outbound | Jump Host / Bastion Servers | SSH execution for Outbreak AI Patching Agent remote remediation |
+| **`25` / `587` / `465` | TCP | Outbound | Corporate SMTP Gateway | Email alerts, CVE patch notifications, and weekly compliance digests |
+| **`389` / `636` | TCP | Outbound | Active Directory / OpenLDAP | Enterprise Single Sign-On (SSO) and LDAP directory authentication |
+| **`514` / `6514` | UDP/TCP/TLS | Outbound | SIEM / Syslog Collectors | Security log forwarding to Splunk, Microsoft Sentinel, IBM QRadar |
 
 ---
 
-### 2. Deep-Dive by Deployment Phase
+### 2. Master External URL / FQDN Egress Allowlist Table
+
+If outbound Internet egress is restricted by an enterprise firewall, corporate proxy (Zscaler, Blue Coat, Netskope), or VPC Security Group, whitelist the following Fully Qualified Domain Names (FQDNs):
+
+| Category | Domain / FQDN | Port | Protocol | Mandatory? | Purpose / Component |
+| :--- | :--- | :--- | :--- | :--- | :--- |
+| **Container Engine** | `registry-1.docker.io` | `443` | TCP / HTTPS | **Mandatory** (Build) | Docker Hub image registry manifest lookup |
+| **Container Engine** | `auth.docker.io` | `443` | TCP / HTTPS | **Mandatory** (Build) | Docker Hub authentication and bearer token service |
+| **Container Engine** | `production.cloudflare.docker.com` | `443` | TCP / HTTPS | **Mandatory** (Build) | Docker Hub layer blob downloads (Cloudflare CDN) |
+| **Container Engine** | `mcr.microsoft.com` | `443` | TCP / HTTPS | Optional (Azure) | Microsoft Container Registry (system base images) |
+| **Container Engine** | `*.data.mcr.microsoft.com` | `443` | TCP / HTTPS | Optional (Azure) | Microsoft Container Registry blob storage |
+| **OS Packages** | `deb.debian.org` | `80, 443` | TCP / HTTP(S) | **Mandatory** (Build) | Debian package repository for Python backend & Node base images |
+| **OS Packages** | `security.debian.org` | `80, 443` | TCP / HTTP(S) | **Mandatory** (Build) | Debian security patches and updates |
+| **OS Packages** | `ftp.debian.org` | `80, 443` | TCP / HTTP(S) | Recommended | Debian secondary fallback mirror |
+| **OS Packages** | `dl-cdn.alpinelinux.org` | `80, 443` | TCP / HTTP(S) | Optional | Alpine Linux apk package mirror (if using Alpine images) |
+| **Node.js / NPM** | `registry.npmjs.org` | `443` | TCP / HTTPS | **Mandatory** (Build) | Node Package Manager registry for frontend & Express backend |
+| **Node.js / NPM** | `*.npmjs.org` | `443` | TCP / HTTPS | **Mandatory** (Build) | NPM package tarball CDNs |
+| **Node.js / NPM** | `registry.yarnpkg.com` | `443` | TCP / HTTPS | Recommended | Cloudflare-backed Yarn/NPM mirror (automatic 503 fallback) |
+| **Node.js / NPM** | `registry.npmmirror.com` | `443` | TCP / HTTPS | Recommended | High-speed global NPM mirror (secondary fallback) |
+| **Python / PyPI** | `pypi.org` | `443` | TCP / HTTPS | **Mandatory** (Build) | Python Package Index index metadata |
+| **Python / PyPI** | `files.pythonhosted.org` | `443` | TCP / HTTPS | **Mandatory** (Build) | PyPI binary wheels and package source tarballs |
+| **Python / PyPI** | `pypi.python.org` | `443` | TCP / HTTPS | Recommended | Legacy PyPI HTTP-to-HTTPS redirect endpoint |
+| **Threat Intelligence** | `services.nvd.nist.gov` | `443` | TCP / HTTPS | **Mandatory** (Runtime) | NIST National Vulnerability Database API 2.0 (Worker CVE sync) |
+| **Threat Intelligence** | `cve.mitre.org` | `443` | TCP / HTTPS | Recommended | MITRE CVE dictionary, CWE taxonomy, and vulnerability links |
+| **Threat Intelligence** | `api.github.com` | `443` | TCP / HTTPS | Recommended | GitHub Security Advisory Database feed |
+| **Threat Intelligence** | `www.cisa.gov` | `443` | TCP / HTTPS | Recommended | CISA Known Exploited Vulnerabilities (KEV) catalog |
+| **Threat Intelligence** | `raw.githubusercontent.com` | `443` | TCP / HTTPS | Recommended | CISA KEV JSON mirror & community vulnerability catalogs |
+| **Threat Intelligence** | `api.first.org` | `443` | TCP / HTTPS | Recommended | FIRST.org Exploit Prediction Scoring System (EPSS) API |
+| **Generative AI** | `generativelanguage.googleapis.com` | `443` | TCP / HTTPS | Recommended (AI) | Google Gemini API (autonomous AI Patching Agent & advisories) |
+| **Generative AI** | `api.ai.tech.gov.sg` | `443` | TCP / HTTPS | Optional (GovTech) | Platform AI GovTech API gateway (if configured in AI settings) |
+| **Azure CI/CD & ACR** | `dev.azure.com` | `443` | TCP / HTTPS | Optional (Azure) | Azure DevOps project repositories and build pipelines |
+| **Azure CI/CD & ACR** | `*.visualstudio.com` | `443` | TCP / HTTPS | Optional (Azure) | Azure DevOps build agent telemetry & task execution |
+| **Azure CI/CD & ACR** | `*.vsassets.io` | `443` | TCP / HTTPS | Optional (Azure) | Azure DevOps pipeline task extensions and artifacts |
+| **Azure CI/CD & ACR** | `login.microsoftonline.com` | `443` | TCP / HTTPS | Optional (Azure) | Azure Entra ID / Active Directory authentication |
+| **Azure CI/CD & ACR** | `management.azure.com` | `443` | TCP / HTTPS | Optional (Azure) | Azure Resource Manager (ARM) API |
+| **Azure CI/CD & ACR** | `<your-acr-name>.azurecr.io` | `443` | TCP / HTTPS | Optional (Azure) | Azure Container Registry push / pull endpoint |
+| **Azure CI/CD & ACR** | `*.blob.core.windows.net` | `443` | TCP / HTTPS | Optional (Azure) | Azure Storage backing ACR layer blobs (*crucial for push/pull*) |
+| **Azure Kubernetes** | `<cluster-name>.<region>.azmk8s.io` | `443` | TCP / HTTPS | Optional (Azure) | AKS Kubernetes API Server control plane |
+
+---
+
+### 3. Deep-Dive by Deployment Phase
 
 #### A. Initial Build Phase (VM or Self-Hosted CI Runner)
 When running `docker compose up --build` or executing `docker build`:
-* **Docker Hub**: Requires access to pull `node:20-alpine`, `python:3.11-slim`, and `postgres:16-alpine`.
-* **Alpine & Debian Mirrors**:
-  * `dl-cdn.alpinelinux.org`
-  * `deb.debian.org`, `security.debian.org`, `ftp.debian.org`
-* **Node & Python Registries**:
-  * `registry.npmjs.org`
-  * `pypi.org` and `files.pythonhosted.org`
+* **Docker Hub**: Requires access to pull `node:20-slim`, `python:3.10-slim`, and `postgres:16-alpine`.
+* **Debian OS Mirrors**: `deb.debian.org`, `security.debian.org`, `ftp.debian.org`
+* **Package Registries**: `registry.npmjs.org`, `registry.yarnpkg.com`, `pypi.org`, `files.pythonhosted.org`.
+* *(Note: If building frontend offline, the Zero-Network build mode bypasses all NPM egress entirely!)*
 
 #### B. CI/CD & Azure Cloud Deployment (AzDO -> ACR -> AKS)
 When building via Azure DevOps pipelines and pushing to ACR / AKS:
@@ -169,12 +203,65 @@ When building via Azure DevOps pipelines and pushing to ACR / AKS:
 
 #### C. Runtime Threat Feeds & AI Assistant
 When containers are actively running in production:
-* **Background Worker**: Queries `services.nvd.nist.gov` to sync CVE records and CVSS v3.1 scores.
+* **Background Worker**: Queries `services.nvd.nist.gov` and `api.first.org` to sync CVE records and EPSS exploitation probability scores.
 * **AI Security Agent**: Queries `generativelanguage.googleapis.com` using `GEMINI_API_KEY` for dynamic zero-day patch scripts, container workarounds, and incident playbooks.
 
 ---
 
-### 3. Corporate VM & Proxy Troubleshooting
+### 4. Enterprise Proxy Bypass (`NO_PROXY`) Requirements
+
+When building or running in corporate proxy environments, the following hostnames and subnets **must bypass the proxy** via `NO_PROXY` / `no_proxy` to ensure internal inter-container communication is never sent to the external gateway:
+
+```bash
+# Recommended NO_PROXY configuration string:
+NO_PROXY="localhost,127.0.0.1,postgres,backend,worker,bootstrap,cve-tracker-db,cve-tracker-api,cve-tracker-ui,cve-tracker-worker,cve-tracker-bootstrap,10.0.0.0/8,172.16.0.0/12,192.168.0.0/16"
+```
+
+---
+
+### 5. Ready-to-Submit Enterprise Firewall Change Request (CR)
+
+Copy and paste this section directly into your company's ServiceNow, Jira Service Management, or IT Security Request portal:
+
+```text
+================================================================================
+FIREWALL / NETWORK CHANGE REQUEST: CVE TRACKER & OUTBREAK CENTER
+================================================================================
+Application: Security Advisory Tracker & Outbreak Response Center
+Target Environment: Corporate VM / Docker Desktop / Cloud VPC
+
+1. INBOUND RULES (Host Listening Ports):
+   - TCP 3000 -> Web UI Dashboard & WebSocket stream (LAN / Workstation access)
+   - TCP 8000 -> FastAPI Backend & Swagger API Docs (LAN / Admin access)
+   - TCP 5432 -> PostgreSQL Database (Localhost / Docker network only)
+
+2. OUTBOUND HTTPS (TCP 443) RULES - MANDATORY FOR BUILD & RUNTIME:
+   - registry-1.docker.io, auth.docker.io, production.cloudflare.docker.com (Docker Hub)
+   - deb.debian.org, security.debian.org, ftp.debian.org (Debian OS Packages)
+   - registry.npmjs.org, *.npmjs.org, registry.yarnpkg.com (Node.js NPM Registries)
+   - pypi.org, files.pythonhosted.org (Python PyPI Registries)
+   - services.nvd.nist.gov (NIST National Vulnerability Database API 2.0)
+   - generativelanguage.googleapis.com (Google Gemini AI Outbreak Advisor)
+
+3. OUTBOUND HTTPS (TCP 443) RULES - RECOMMENDED THREAT FEEDS:
+   - cve.mitre.org (MITRE CVE reference links)
+   - api.github.com, raw.githubusercontent.com (GitHub Security Feeds)
+   - www.cisa.gov, api.first.org (CISA KEV Catalog & FIRST EPSS Scoring)
+
+4. OPTIONAL OUTBOUND INTEGRATION RULES (If configured in dashboard):
+   - TCP 22 -> Target Jump Hosts / Bastions (Automated Remote Patching)
+   - TCP 25/587/465 -> Corporate SMTP Server (Security Alert Email Delivery)
+   - TCP 389/636 -> Active Directory Domain Controllers (LDAP/LDAPS SSO)
+   - TCP/UDP 514 / TLS 6514 -> Corporate SIEM (Splunk / Sentinel Syslog)
+
+5. PROXY BYPASS LIST:
+   - localhost, 127.0.0.1, postgres, backend, worker, 172.16.0.0/12
+================================================================================
+```
+
+---
+
+### 6. Corporate VM & Proxy Troubleshooting
 
 If your corporate VM sits behind a forward proxy or uses private corporate DNS servers, follow these configurations:
 

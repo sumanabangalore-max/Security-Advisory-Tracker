@@ -32,24 +32,34 @@ RUN if [ -f "dist/index.html" ] && [ -f "dist/server.cjs" ]; then \
         echo "✓ Skipping container npm network downloads (Zero-Network Build)."; \
         echo "================================================================="; \
     else \
-        echo "No pre-built bundle found. Building from source inside container..."; \
+        echo "No pre-built bundle found in dist/. Attempting to install and build inside container..."; \
         npm config set strict-ssl false || true; \
         npm config set audit false || true; \
         npm config set fund false || true; \
         npm config set fetch-retries 2 || true; \
         npm config set fetch-retry-mintimeout 1000 || true; \
         npm config set fetch-retry-maxtimeout 5000 || true; \
+        INSTALLED=0; \
         if [ -n "${NPM_CONFIG_REGISTRY:-}" ]; then \
             echo "Using custom registry: ${NPM_CONFIG_REGISTRY}"; \
             sed -i "s|https://registry.npmjs.org/|${NPM_CONFIG_REGISTRY%/}/|g" package-lock.json 2>/dev/null || true; \
             npm config set registry "${NPM_CONFIG_REGISTRY}"; \
-            npm ci --no-audit --no-fund || npm install --no-audit --no-fund; \
-        else \
-            (npm ci --no-audit --no-fund || npm install --no-audit --no-fund || { \
-                echo "Falling back to mirror registry..."; \
-                rm -f package-lock.json; \
-                npm install --no-audit --no-fund --registry=https://registry.yarnpkg.com || npm install --no-audit --no-fund --registry=https://registry.npmmirror.com; \
-            }); \
+            (npm ci --no-audit --no-fund || npm install --no-audit --no-fund) && INSTALLED=1; \
+        elif (npm ci --no-audit --no-fund || npm install --no-audit --no-fund); then \
+            INSTALLED=1; \
+        elif (npm install --no-audit --no-fund --registry=https://registry.yarnpkg.com); then \
+            INSTALLED=1; \
+        elif (rm -f package-lock.json && npm install --no-audit --no-fund --registry=https://registry.npmmirror.com); then \
+            INSTALLED=1; \
+        fi; \
+        if [ "$INSTALLED" -ne 1 ]; then \
+            echo "================================================================="; \
+            echo "ERROR: npm package download failed inside Docker container!"; \
+            echo "Your corporate proxy/firewall is blocking outbound npm traffic."; \
+            echo "EASY FIX: Run 'npm install && npm run build' on your host machine,"; \
+            echo "then re-run 'docker compose build frontend' (Zero-Network mode)."; \
+            echo "================================================================="; \
+            exit 1; \
         fi; \
         npm run build; \
     fi
