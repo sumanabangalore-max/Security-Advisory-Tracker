@@ -17,50 +17,42 @@ ENV NODE_TLS_REJECT_UNAUTHORIZED=0 \
     NPM_CONFIG_FUND=false \
     NPM_CONFIG_UPDATE_NOTIFIER=false
 
-# Copy package manifests first to leverage Docker layer caching
-COPY package*.json ./
+# Copy files (dist is included from workspace for instant offline builds)
+COPY . .
 
 # Automatically prune any stray angular reference if building from an older local directory
 RUN sed -i '/"angular"/d' package.json package-lock.json 2>/dev/null || true
 
-# Resilient npm configuration for corporate environments, proxies, and custom registries
-RUN npm config set strict-ssl false \
-    && npm config set audit false \
-    && npm config set fund false \
-    && npm config set fetch-retries 2 \
-    && npm config set fetch-retry-mintimeout 1000 \
-    && npm config set fetch-retry-maxtimeout 5000 \
-    && if [ -n "${NPM_CONFIG_REGISTRY:-}" ]; then \
-        echo "Configuring custom NPM registry: ${NPM_CONFIG_REGISTRY}"; \
-        sed -i "s|https://registry.npmjs.org/|${NPM_CONFIG_REGISTRY%/}/|g" package-lock.json 2>/dev/null || true; \
-        npm config set registry "${NPM_CONFIG_REGISTRY}"; \
-        npm ci --no-audit --no-fund || npm install --no-audit --no-fund; \
-    elif npm ci --no-audit --no-fund; then \
-        echo "Installed dependencies successfully via standard npm ci"; \
+# Intelligent offline-first build detection:
+# 1. If pre-built dist/index.html and dist/server.cjs exist, use them directly (Zero-Network Build)
+# 2. Otherwise, install dependencies and compile from source
+RUN if [ -f "dist/index.html" ] && [ -f "dist/server.cjs" ]; then \
+        echo "================================================================="; \
+        echo "✓ Pre-built production bundle detected in dist/ directory!"; \
+        echo "✓ Skipping container npm network downloads (Zero-Network Build)."; \
+        echo "================================================================="; \
     else \
-        echo "Primary registry failed (likely HTTP 503 / firewall block). Falling back to Cloudflare/Yarn mirror..."; \
-        sed -i 's|https://registry.npmjs.org/|https://registry.yarnpkg.com/|g' package-lock.json 2>/dev/null || true; \
-        npm config set registry https://registry.yarnpkg.com/; \
-        npm ci --no-audit --no-fund || { \
-            echo "Cloudflare/Yarn mirror lockfile attempt failed. Trying npmmirror..."; \
-            sed -i 's|https://registry.yarnpkg.com/|https://registry.npmmirror.com/|g' package-lock.json 2>/dev/null || true; \
-            npm config set registry https://registry.npmmirror.com/; \
-            npm ci --no-audit --no-fund || { \
-                echo "Falling back to fresh npm install without lockfile constraint..."; \
+        echo "No pre-built bundle found. Building from source inside container..."; \
+        npm config set strict-ssl false || true; \
+        npm config set audit false || true; \
+        npm config set fund false || true; \
+        npm config set fetch-retries 2 || true; \
+        npm config set fetch-retry-mintimeout 1000 || true; \
+        npm config set fetch-retry-maxtimeout 5000 || true; \
+        if [ -n "${NPM_CONFIG_REGISTRY:-}" ]; then \
+            echo "Using custom registry: ${NPM_CONFIG_REGISTRY}"; \
+            sed -i "s|https://registry.npmjs.org/|${NPM_CONFIG_REGISTRY%/}/|g" package-lock.json 2>/dev/null || true; \
+            npm config set registry "${NPM_CONFIG_REGISTRY}"; \
+            npm ci --no-audit --no-fund || npm install --no-audit --no-fund; \
+        else \
+            (npm ci --no-audit --no-fund || npm install --no-audit --no-fund || { \
+                echo "Falling back to mirror registry..."; \
                 rm -f package-lock.json; \
                 npm install --no-audit --no-fund --registry=https://registry.yarnpkg.com || npm install --no-audit --no-fund --registry=https://registry.npmmirror.com; \
-            }; \
-        }; \
+            }); \
+        fi; \
+        npm run build; \
     fi
-
-# Copy source code (respecting .dockerignore)
-COPY . .
-
-# Run production build (compiles Vite React frontend & bundles server.ts)
-RUN npm run build
-
-# Prune devDependencies to keep only runtime dependencies for production
-RUN npm prune --omit=dev
 
 # Production-ready thin image
 FROM node:20-slim
@@ -70,10 +62,6 @@ WORKDIR /app
 # Copy package manifests
 COPY package*.json ./
 
-# Copy production node_modules directly from the builder stage
-# (Eliminates redundant network downloads and avoids npm failures in stage 2)
-COPY --from=builder /app/node_modules ./node_modules
-
 # Copy built frontend & server bundles, plus inventory data
 COPY --from=builder /app/dist ./dist
 COPY --from=builder /app/inventory ./inventory
@@ -81,8 +69,8 @@ COPY --from=builder /app/inventory ./inventory
 # Expose port 3000 (standard port for Express)
 EXPOSE 3000
 
-ENV NODE_ENV=production
-ENV PORT=3000
+ENV NODE_ENV=production \
+    PORT=3000
 
-# Start the bundled Express server
-CMD ["npm", "run", "start"]
+# Start the bundled Express server directly
+CMD ["node", "dist/server.cjs"]

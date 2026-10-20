@@ -1,6 +1,6 @@
 node_modules
 npm-debug.log
-dist
+# dist is included so Docker builds work offline / behind corporate proxies without npm network calls
 .git
 .gitignore
 .env
