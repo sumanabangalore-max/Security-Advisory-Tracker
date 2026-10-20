@@ -212,28 +212,31 @@ Or configure Docker client globally in `~/.docker/config.json`:
 }
 ```
 
-#### 3. Handling SSL / TLS Decryption & Custom Corporate CA Certificates
-If your firewall performs TLS deep packet inspection (DPI), `npm ci` and `pip install` may reject corporate certificates:
-* **For NPM / Node**: Set `NODE_EXTRA_CA_CERTS=/path/to/corporate-ca.crt` or pass it as a Docker build secret.
-* **For Python Pip**: Use `pip install --cert /path/to/corporate-ca.crt -r requirements.txt`.
-
-#### 4. Troubleshooting Docker Desktop Build Failures (`exit code: 1` on `target bootstrap` / `pip install`)
-If `docker compose up --build` fails on Docker Desktop (Windows WSL2 or macOS) with:
+#### 3. Handling SSL / TLS Decryption & Corporate Self-Signed Certificate Errors
+If your environment runs behind a corporate firewall, VPN, or proxy that performs SSL/TLS deep packet inspection (e.g. Zscaler, Palo Alto Networks, Netskope, Cisco Umbrella, Fortinet), Docker builds can fail with:
 ```text
-target bootstrap: failed to solve: process "/bin/sh -c pip install --no-cache-dir --upgrade pip && pip install --no-cache-dir -r requirements.txt" did not complete successfully: exit code: 1
+SSLCertVerificationError: [SSL: CERTIFICATE_VERIFY_FAILED] certificate verify failed: self-signed certificate in certificate chain (_ssl.c:1017)
+Could not fetch URL https://pypi.org/simple/fastapi/
+ERROR: Could not find a version that satisfies the requirement fastapi
 ```
 
-This typically happens due to one of three root causes:
-1. **Docker Desktop Network Mode**: In Docker Desktop (unlike bare Linux), setting `network: host` inside `docker-compose.yml` cuts off the build container from Docker Desktop's internal DNS proxy (leaving containers unable to resolve `pypi.org`). *This has been resolved by using standard bridge networking in `docker-compose.yml`.*
-2. **Pip Connection Timeout**: Slow network connections or corporate VPN proxies dropping the default 15s pip socket timeout. *This has been resolved by configuring `--default-timeout=100` and `--retries=5` in `backend/Dockerfile`.*
-3. **Source Compilation / Rust Dependency**: Without `--prefer-binary` or with unpinned `bcrypt>=4.1.0`, pip tries to compile packages from source requiring Rust/C toolchains. *This has been resolved with `--prefer-binary` and pinning `bcrypt>=3.2.0,<4.1.0` in `requirements.txt`.*
+**How This Has Been Resolved in the Codebase**:
+* **Backend (`backend/Dockerfile`)**: Configures system-wide `/etc/pip.conf` and passes `--trusted-host pypi.org --trusted-host files.pythonhosted.org --trusted-host pypi.python.org`. This instructs `pip` to trust PyPI hosts directly, bypassing SSL inspection certificate chain rejections.
+* **Frontend (`Dockerfile`)**: Automatically falls back to `npm install --strict-ssl=false` if corporate SSL inspection blocks `npm ci`.
+
+#### 4. Troubleshooting Docker Desktop Build Failures (`exit code: 1` on `target bootstrap` / `pip install`)
+If `docker compose up --build` failed previously on Docker Desktop (Windows WSL2 or macOS), it was due to:
+1. **Corporate SSL Inspection**: Corporate proxies re-encrypting traffic with self-signed root certs unknown to clean Debian images. *(Resolved with `--trusted-host` and `/etc/pip.conf`)*.
+2. **Network Mode**: Setting `network: host` inside Docker Compose on Docker Desktop cuts off internal DNS routing. *(Resolved by using standard Docker bridge networking)*.
+3. **Pip Connection Timeout**: Slow network connections dropping the default 15s timeout. *(Resolved with `--default-timeout=100` and `--retries=5`)*.
+4. **Source Compilation / Rust Dependency**: Unpinned bcrypt requiring Rust toolchains. *(Resolved with `--prefer-binary` and pinning `bcrypt>=3.2.0,<4.1.0`)*.
 
 **Recommended Clean Rebuild Command on Docker Desktop**:
 ```bash
-# Clean cache and rebuild the bootstrap, backend, and worker images:
+# 1. Rebuild images with no-cache so Docker picks up the updated Dockerfile:
 docker compose build --no-cache bootstrap backend worker
 
-# Launch all containers:
+# 2. Launch all containers in detached mode:
 docker compose up -d
 ```
 

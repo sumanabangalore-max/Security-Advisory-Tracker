@@ -7,10 +7,11 @@ WORKDIR /app
 COPY package*.json ./
 
 # Configure npm network timeouts and retry resilience for restricted/cloud VM networks
+# Handles SSL interception proxies (strict-ssl fallback)
 RUN npm config set fetch-retries 5 \
     && npm config set fetch-retry-mintimeout 20000 \
     && npm config set fetch-retry-maxtimeout 120000 \
-    && (npm ci || npm install)
+    && (npm ci || npm install || npm install --strict-ssl=false)
 
 # Copy source code (respecting .dockerignore)
 COPY . .
