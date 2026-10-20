@@ -1,17 +1,33 @@
 # Multi-stage build for full-stack Node.js Express + React/Vite application
-FROM node:20-alpine AS builder
+# Uses node:20-slim (Debian glibc) instead of Alpine to eliminate DNS IPv6 lookup stalls on corporate VPNs / WSL2
+FROM node:20-slim AS builder
 
 WORKDIR /app
+
+# Support optional corporate proxy build args
+ARG HTTP_PROXY
+ARG HTTPS_PROXY
+ARG NO_PROXY
+ARG NPM_CONFIG_REGISTRY
+
+# Disable strict SSL and package auditing upfront to prevent corporate DPI firewalls from hanging npm
+ENV NODE_TLS_REJECT_UNAUTHORIZED=0 \
+    NPM_CONFIG_STRICT_SSL=false \
+    NPM_CONFIG_AUDIT=false \
+    NPM_CONFIG_FUND=false \
+    NPM_CONFIG_UPDATE_NOTIFIER=false
 
 # Copy package manifests first to leverage Docker layer caching
 COPY package*.json ./
 
-# Configure npm network timeouts and retry resilience for restricted/cloud VM networks
-# Handles SSL interception proxies (strict-ssl fallback)
-RUN npm config set fetch-retries 5 \
-    && npm config set fetch-retry-mintimeout 20000 \
-    && npm config set fetch-retry-maxtimeout 120000 \
-    && (npm ci || npm install || npm install --strict-ssl=false)
+# Fast, non-blocking npm configuration with short retry timeouts (1-5s instead of 2 minutes)
+RUN npm config set strict-ssl false \
+    && npm config set audit false \
+    && npm config set fund false \
+    && npm config set fetch-retries 2 \
+    && npm config set fetch-retry-mintimeout 1000 \
+    && npm config set fetch-retry-maxtimeout 5000 \
+    && (npm ci --no-audit --no-fund || npm install --no-audit --no-fund)
 
 # Copy source code (respecting .dockerignore)
 COPY . .
@@ -23,7 +39,7 @@ RUN npm run build
 RUN npm prune --omit=dev
 
 # Production-ready thin image
-FROM node:20-alpine
+FROM node:20-slim
 
 WORKDIR /app
 

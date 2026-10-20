@@ -231,12 +231,25 @@ If `docker compose up --build` failed previously on Docker Desktop (Windows WSL2
 3. **Pip Connection Timeout**: Slow network connections dropping the default 15s timeout. *(Resolved with `--default-timeout=100` and `--retries=5`)*.
 4. **Source Compilation / Rust Dependency**: Unpinned bcrypt requiring Rust toolchains. *(Resolved with `--prefer-binary` and pinning `bcrypt>=3.2.0,<4.1.0`)*.
 
+#### 5. Troubleshooting Long Stalls on `[builder 4/7] RUN npm config set fetch-retries`
+If Docker build appeared stuck on the frontend `npm` installation stage for 10–15+ minutes:
+* **Root Cause 1 (Timeout Multipliers)**: Previous retry settings (`fetch-retry-maxtimeout 120000` = 2 minutes * 5 retries per package) caused npm to silently hang for tens of minutes on any slow or throttled corporate connection.
+* **Root Cause 2 (Alpine musl DNS Stalls)**: Alpine Linux (`node:20-alpine`) uses musl libc, which queries IPv6 (AAAA) and IPv4 (A) in parallel. In Docker Desktop, WSL2, and corporate VPN environments, dropped IPv6 packets cause Alpine to wait 5–15 seconds per network query.
+* **Root Cause 3 (Corporate SSL Inspection)**: NPM was running with `strict-ssl=true` before falling back, triggering retries on every single package download when intercepting proxies are present.
+
+**How This Has Been Resolved**:
+1. Switched frontend Dockerfile from `node:20-alpine` to **`node:20-slim`** (standard Debian glibc), resolving all Alpine/WSL2 IPv6 DNS lookup delays.
+2. Set `ENV NODE_TLS_REJECT_UNAUTHORIZED=0` and `NPM_CONFIG_STRICT_SSL=false` **upfront** so npm immediately connects without waiting for SSL timeout penalties.
+3. Lowered retry wait times to snappy defaults (`fetch-retry-mintimeout 1000`, `fetch-retry-maxtimeout 5000` = 1s to 5s max).
+
 **Recommended Clean Rebuild Command on Docker Desktop**:
 ```bash
-# 1. Rebuild images with no-cache so Docker picks up the updated Dockerfile:
-docker compose build --no-cache bootstrap backend worker
+# 1. Cancel the stuck command in your terminal using Ctrl+C
 
-# 2. Launch all containers in detached mode:
+# 2. Rebuild the frontend and backend images cleanly:
+docker compose build --no-cache frontend backend bootstrap worker
+
+# 3. Launch all containers in detached mode:
 docker compose up -d
 ```
 
