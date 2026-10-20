@@ -88,7 +88,7 @@ docker compose exec backend python scripts/seed_admin.py
 
 ### 3. Access the Dashboard
 Open your web browser and go to:
-* **UI Portal**: `http://localhost:5173`
+* **UI Portal**: `http://localhost:3000` (or `http://localhost:5173` if running Vite locally)
 * **API Swagger Docs**: `http://localhost:8000/docs`
 
 Log in using `admin` and the generated password from step 2. You can trigger scans, manage inventory files, assign engineers, and deploy the AI Patching Agent live!
@@ -216,6 +216,26 @@ Or configure Docker client globally in `~/.docker/config.json`:
 If your firewall performs TLS deep packet inspection (DPI), `npm ci` and `pip install` may reject corporate certificates:
 * **For NPM / Node**: Set `NODE_EXTRA_CA_CERTS=/path/to/corporate-ca.crt` or pass it as a Docker build secret.
 * **For Python Pip**: Use `pip install --cert /path/to/corporate-ca.crt -r requirements.txt`.
+
+#### 4. Troubleshooting Docker Desktop Build Failures (`exit code: 1` on `target bootstrap` / `pip install`)
+If `docker compose up --build` fails on Docker Desktop (Windows WSL2 or macOS) with:
+```text
+target bootstrap: failed to solve: process "/bin/sh -c pip install --no-cache-dir --upgrade pip && pip install --no-cache-dir -r requirements.txt" did not complete successfully: exit code: 1
+```
+
+This typically happens due to one of three root causes:
+1. **Docker Desktop Network Mode**: In Docker Desktop (unlike bare Linux), setting `network: host` inside `docker-compose.yml` cuts off the build container from Docker Desktop's internal DNS proxy (leaving containers unable to resolve `pypi.org`). *This has been resolved by using standard bridge networking in `docker-compose.yml`.*
+2. **Pip Connection Timeout**: Slow network connections or corporate VPN proxies dropping the default 15s pip socket timeout. *This has been resolved by configuring `--default-timeout=100` and `--retries=5` in `backend/Dockerfile`.*
+3. **Source Compilation / Rust Dependency**: Without `--prefer-binary` or with unpinned `bcrypt>=4.1.0`, pip tries to compile packages from source requiring Rust/C toolchains. *This has been resolved with `--prefer-binary` and pinning `bcrypt>=3.2.0,<4.1.0` in `requirements.txt`.*
+
+**Recommended Clean Rebuild Command on Docker Desktop**:
+```bash
+# Clean cache and rebuild the bootstrap, backend, and worker images:
+docker compose build --no-cache bootstrap backend worker
+
+# Launch all containers:
+docker compose up -d
+```
 
 ---
 

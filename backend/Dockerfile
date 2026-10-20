@@ -2,14 +2,23 @@ FROM python:3.10-slim
 
 WORKDIR /app
 
-# Python 3.10-slim already includes CA certificates and SSL libraries.
-# All packages in requirements.txt (including psycopg2-binary, pandas, cryptography, uvicorn)
-# provide pre-compiled wheels, so gcc/g++/libpq-dev are not required.
+# Support optional build args for corporate proxies / private mirrors
+ARG HTTP_PROXY
+ARG HTTPS_PROXY
+ARG NO_PROXY
+ARG PIP_INDEX_URL
+ARG PIP_TRUSTED_HOST
 
+ENV PYTHONUNBUFFERED=1 \
+    PIP_DISABLE_PIP_VERSION_CHECK=1 \
+    PIP_DEFAULT_TIMEOUT=100
 
 COPY requirements.txt .
-RUN pip install --no-cache-dir --upgrade pip && \
-    pip install --no-cache-dir -r requirements.txt
+
+# 1. Best-effort pip upgrade (does not fail build if pip is already current or on transient net glitch)
+# 2. Resilient install with 100s timeout, 5 retries, and --prefer-binary to ensure binary wheels are used
+RUN python -m pip install --no-cache-dir --default-timeout=100 --retries=5 --upgrade pip || true && \
+    python -m pip install --no-cache-dir --default-timeout=100 --retries=5 --prefer-binary -r requirements.txt
 
 # Copy source code
 COPY . .
