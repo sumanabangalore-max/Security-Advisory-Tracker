@@ -5,13 +5,18 @@ FROM ${NODE_BASE} AS builder
 
 WORKDIR /app
 
-# Support optional corporate proxy build args
+# Support optional corporate proxy build args and propagate to container environment
 ARG HTTP_PROXY
 ARG HTTPS_PROXY
 ARG NO_PROXY
 
-# Disable strict SSL and package auditing upfront to prevent corporate DPI firewalls from hanging npm
-ENV NODE_TLS_REJECT_UNAUTHORIZED=0 \
+ENV HTTP_PROXY=${HTTP_PROXY} \
+    HTTPS_PROXY=${HTTPS_PROXY} \
+    NO_PROXY=${NO_PROXY} \
+    http_proxy=${HTTP_PROXY} \
+    https_proxy=${HTTPS_PROXY} \
+    no_proxy=${NO_PROXY} \
+    NODE_TLS_REJECT_UNAUTHORIZED=0 \
     NPM_CONFIG_STRICT_SSL=false \
     NPM_CONFIG_AUDIT=false \
     NPM_CONFIG_FUND=false \
@@ -20,8 +25,10 @@ ENV NODE_TLS_REJECT_UNAUTHORIZED=0 \
 # Copy files (dist is included from workspace for instant offline builds)
 COPY . .
 
-# Automatically prune any stray angular reference if building from an older local directory
-RUN sed -i '/"angular"/d' package.json package-lock.json 2>/dev/null || true
+# Automatically prune stray angular references and ensure lockfile strictly points to registry.npmjs.org
+RUN sed -i '/"angular"/d' package.json package-lock.json 2>/dev/null || true \
+    && sed -i 's|https://registry.yarnpkg.com/|https://registry.npmjs.org/|g' package-lock.json 2>/dev/null || true \
+    && sed -i 's|https://registry.npmmirror.com/|https://registry.npmjs.org/|g' package-lock.json 2>/dev/null || true
 
 # Intelligent build detection:
 # 1. If pre-built dist/index.html and dist/server.cjs exist, use them directly (Zero-Network Build)
@@ -37,9 +44,12 @@ RUN if [ -f "dist/index.html" ] && [ -f "dist/server.cjs" ]; then \
         npm config set strict-ssl false || true; \
         npm config set audit false || true; \
         npm config set fund false || true; \
-        npm config set fetch-retries 3 || true; \
-        npm config set fetch-retry-mintimeout 2000 || true; \
-        npm config set fetch-retry-maxtimeout 10000 || true; \
+        npm config set maxsockets 3 || true; \
+        npm config set fetch-retries 5 || true; \
+        npm config set fetch-retry-mintimeout 3000 || true; \
+        npm config set fetch-retry-maxtimeout 15000 || true; \
+        if [ -n "${HTTP_PROXY:-}" ]; then npm config set proxy "${HTTP_PROXY}" || true; fi; \
+        if [ -n "${HTTPS_PROXY:-}" ]; then npm config set https-proxy "${HTTPS_PROXY}" || true; fi; \
         (npm ci --no-audit --no-fund || npm install --no-audit --no-fund) || { \
             echo "================================================================="; \
             echo "ERROR: npm install from registry.npmjs.org failed!"; \
