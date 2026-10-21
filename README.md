@@ -160,10 +160,8 @@ If outbound Internet egress is restricted by an enterprise firewall, corporate p
 | **OS Packages** | `security.debian.org` | `80, 443` | TCP / HTTP(S) | **Mandatory** (Build) | Debian security patches and updates |
 | **OS Packages** | `ftp.debian.org` | `80, 443` | TCP / HTTP(S) | Recommended | Debian secondary fallback mirror |
 | **OS Packages** | `dl-cdn.alpinelinux.org` | `80, 443` | TCP / HTTP(S) | Optional | Alpine Linux apk package mirror (if using Alpine images) |
-| **Node.js / NPM** | `registry.npmjs.org` | `443` | TCP / HTTPS | **Mandatory** (Build) | Node Package Manager registry for frontend & Express backend |
+| **Node.js / NPM** | `registry.npmjs.org` | `443` | TCP / HTTPS | **Mandatory** (Build) | Node Package Manager official registry |
 | **Node.js / NPM** | `*.npmjs.org` | `443` | TCP / HTTPS | **Mandatory** (Build) | NPM package tarball CDNs |
-| **Node.js / NPM** | `registry.yarnpkg.com` | `443` | TCP / HTTPS | Recommended | Cloudflare-backed Yarn/NPM mirror (automatic 503 fallback) |
-| **Node.js / NPM** | `registry.npmmirror.com` | `443` | TCP / HTTPS | Recommended | High-speed global NPM mirror (secondary fallback) |
 | **Python / PyPI** | `pypi.org` | `443` | TCP / HTTPS | **Mandatory** (Build) | Python Package Index index metadata |
 | **Python / PyPI** | `files.pythonhosted.org` | `443` | TCP / HTTPS | **Mandatory** (Build) | PyPI binary wheels and package source tarballs |
 | **Python / PyPI** | `pypi.python.org` | `443` | TCP / HTTPS | Recommended | Legacy PyPI HTTP-to-HTTPS redirect endpoint |
@@ -238,7 +236,7 @@ Target Environment: Corporate VM / Docker Desktop / Cloud VPC
 2. OUTBOUND HTTPS (TCP 443) RULES - MANDATORY FOR BUILD & RUNTIME:
    - registry-1.docker.io, auth.docker.io, production.cloudflare.docker.com (Docker Hub)
    - deb.debian.org, security.debian.org, ftp.debian.org (Debian OS Packages)
-   - registry.npmjs.org, *.npmjs.org, registry.yarnpkg.com (Node.js NPM Registries)
+   - registry.npmjs.org, *.npmjs.org (Official Node.js NPM Registry)
    - pypi.org, files.pythonhosted.org (Python PyPI Registries)
    - services.nvd.nist.gov (NIST National Vulnerability Database API 2.0)
    - generativelanguage.googleapis.com (Google Gemini AI Outbreak Advisor)
@@ -361,6 +359,33 @@ docker compose ps
 ```
 
 *(Optional: If you ever edit frontend/backend source files locally, simply run `npm run build` on your host machine first, then run `docker compose build frontend`!)*
+
+#### 7. Troubleshooting Docker Hub 429 Too Many Requests
+If the Docker build fails with:
+```text
+target backend: failed to solve: python:3.10-slim: failed to resolve source metadata for docker.io/library/python:3.10-slim: unexpected status from HEAD request to https://registry-1.docker.io/v2/library/python/manifests/3.10-slim: 429 Too Many Requests
+```
+
+* **Why this occurs**: Docker Hub limits anonymous image pulls to **100 pulls per 6 hours per public IP address**. In corporate networks with a forward proxy or NAT gateway, all developers share the same external IP address. Once the quota is reached across your company, Docker Hub returns `429 Too Many Requests` on base images (`python:3.10-slim`, `node:20-slim`, `postgres:16-alpine`).
+
+**Solutions**:
+1. **Option A (Instant Fix - Sign in to Docker Hub)**:
+   * Run in terminal: `docker login` (using your free Docker ID credentials), or:
+   * Open **Docker Desktop** and click **Sign in** in the top-right corner.
+   * *A logged-in account gets a dedicated personal quota (200 pulls/6hr) completely separated from your company's shared IP address, immediately bypassing the 429 block.*
+
+2. **Option B (No Account Required - Use AWS Public ECR Mirror)**:
+   AWS hosts official, rate-limit-free mirrors of standard Docker Hub images. Both `Dockerfile` and `backend/Dockerfile` support the `PYTHON_BASE` and `NODE_BASE` build arguments:
+   ```bash
+   # Build using AWS Public ECR mirrors (bypasses Docker Hub rate limits completely):
+   docker compose build \
+     --build-arg PYTHON_BASE="public.ecr.aws/docker/library/python:3.10-slim" \
+     --build-arg NODE_BASE="public.ecr.aws/docker/library/node:20-slim" \
+     backend bootstrap worker frontend
+   ```
+
+3. **Option C (Tag Local Cache)**:
+   If you pull the base images once from an alternate network (e.g. mobile hotspot or home network), Docker caches them locally on your machine and will never request them again during subsequent builds.
 
 ---
 

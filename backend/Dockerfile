@@ -1,4 +1,5 @@
-FROM python:3.10-slim
+ARG PYTHON_BASE=python:3.10-slim
+FROM ${PYTHON_BASE}
 
 WORKDIR /app
 

@@ -46,6 +46,7 @@ services:
         - no_proxy
         - PIP_INDEX_URL
         - PIP_TRUSTED_HOST
+        - PYTHON_BASE
     container_name: cve-tracker-api
     ports:
       - "8000:8000"
@@ -92,6 +93,7 @@ services:
         - https_proxy
         - no_proxy
         - NPM_CONFIG_REGISTRY
+        - NODE_BASE
     container_name: cve-tracker-ui
     ports:
       - "3000:3000"
