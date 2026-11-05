@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { 
   LogOut, ShieldAlert, Layers, Clock, Settings, MessageSquare, 
   Coins, Building2, LayoutDashboard, Cloud, ShieldCheck, Flame, ChevronRight,
-  ChevronDown, Users, Wrench, Key, Mail, Database, Package
+  ChevronDown, Users, Wrench, Key, Mail, Database, Package, Sliders
 } from "lucide-react";
 import { api } from "../api";
 import { DashboardStats, ScanProgressState, LdapConfig, LoggingConfig } from "../types";
@@ -21,6 +21,7 @@ import ExecutiveOverviewDashboard from "./ExecutiveOverviewDashboard";
 import LdapConfigPanel from "./LdapConfigPanel";
 import ExternalLoggingPanel from "./ExternalLoggingPanel";
 import DeployAipatchModal from "./DeployAipatchModal";
+import CvssVectorAnalyserTab from "./CvssVectorAnalyserTab";
 import { Vulnerability, UserRole } from "../types";
 
 interface DashboardProps {
@@ -32,6 +33,7 @@ interface DashboardProps {
 export type ActiveTabType = 
   | "overview" 
   | "vulnerabilities" 
+  | "cvss-analyser"
   | "zero-day" 
   | "inventory" 
   | "ldap-config" 
@@ -74,11 +76,11 @@ export default function Dashboard({ username, userRole, onLogout }: DashboardPro
 
   const isTabAllowedForRole = (tabId: string, role: UserRole): boolean => {
     if (role === "admin") return true;
-    if (role === "patch_manager") return ["patch-tracker", "inventory"].includes(tabId);
+    if (role === "patch_manager") return ["patch-tracker", "inventory", "cvss-analyser"].includes(tabId);
     if (role === "eos_manager") return ["eos-eol", "inventory"].includes(tabId);
-    if (role === "vuln_manager") return ["vulnerabilities", "zero-day", "overview", "inventory"].includes(tabId);
+    if (role === "vuln_manager") return ["vulnerabilities", "cvss-analyser", "zero-day", "overview", "inventory"].includes(tabId);
     if (role === "analyst") return tabId !== "administration";
-    if (role === "viewer") return ["overview", "vulnerabilities", "inventory", "eos-eol", "patch-tracker"].includes(tabId);
+    if (role === "viewer") return ["overview", "vulnerabilities", "cvss-analyser", "inventory", "eos-eol", "patch-tracker"].includes(tabId);
     return false;
   };
 
@@ -264,6 +266,7 @@ export default function Dashboard({ username, userRole, onLogout }: DashboardPro
   const navItems: NavItem[] = [
     { id: "overview", label: "Executive Overview", icon: LayoutDashboard },
     { id: "vulnerabilities", label: "Vulnerabilities", icon: ShieldAlert },
+    { id: "cvss-analyser", label: "CVSS Vector Analyser", icon: Sliders },
     { id: "zero-day", label: "Zero-Day Radar", icon: Flame, badge: stats.zero_day_count || 1 },
     { id: "inventory", label: "Master Inventory", icon: Layers },
     { id: "eos-eol", label: "EOS/EOL Tracker", icon: Clock },
@@ -561,6 +564,8 @@ export default function Dashboard({ username, userRole, onLogout }: DashboardPro
                 />
               </div>
             </div>
+          ) : activeTab === "cvss-analyser" ? (
+            <CvssVectorAnalyserTab />
           ) : activeTab === "zero-day" ? (
             <div className="space-y-6">
               <ZeroDayAlertPanel
