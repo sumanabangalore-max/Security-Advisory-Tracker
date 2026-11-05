@@ -4562,8 +4562,12 @@ app.get("/api/v1/cvss/resolve", async (req, res) => {
             if (!description && cna.descriptions?.[0]?.value) description = cna.descriptions[0].value;
             const cnaAssigner = cveOrgJson.cveMetadata?.assignerShortName || "Primary CNA";
 
-            const cnaMetrics = cna.metrics || [];
-            for (const m of cnaMetrics) {
+            const allMetrics = [
+              ...(cna.metrics || []),
+              ...((cveOrgJson?.containers?.adp || []).flatMap((adp: any) => adp.metrics || []))
+            ];
+
+            for (const m of allMetrics) {
               if (m.cvssV3_1 && !cvss31Data) {
                 cvss31Data = {
                   version: "3.1",
@@ -4592,44 +4596,36 @@ app.get("/api/v1/cvss/resolve", async (req, res) => {
       }
     }
 
-    // 3. Fallback to local MOCK_CVES / matchedVulnerabilities if external APIs blocked or unreachable
+    // 3. Fallback to local matchedVulnerabilities only if user explicitly loaded it, otherwise report unreachable
+    let unreachableError: string | null = null;
     if (!cvss31Data) {
-      const existing = matchedVulnerabilities.find(v => v.cve_id.toUpperCase() === cleanId)
-        || MOCK_CVES.find(c => c.cve_id.toUpperCase() === cleanId);
-      if (existing) {
+      const existing = matchedVulnerabilities.find(v => v.cve_id.toUpperCase() === cleanId);
+      if (existing && existing.cvss_vector) {
         resolutionSource = "Mock/Cache";
         description = existing.summary || description;
         cvss31Data = {
           version: "3.1",
-          vectorString: existing.cvss_vector || "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H",
+          vectorString: existing.cvss_vector,
           baseScore: existing.cvss_score || 7.5,
           baseSeverity: (existing as any).severity || "HIGH",
           sourceType: "CNA Secondary",
-          sourceName: existing.source || "Vendor Security Advisory"
+          sourceName: existing.source || "Inventory Cache"
         };
+      } else {
+        // DO NOT show false 9.8 score when upstream is unreachable!
+        unreachableError = `Cannot reach official threat intelligence feeds (NVD / CVE.org) for ${cleanId}. If running behind a corporate firewall, ensure 'services.nvd.nist.gov' and 'cveawg.mitre.org' are allowlisted on port 443.`;
       }
     }
 
-    if (!cvss31Data) {
-      // Default standard vector for unknown or fresh CVE
-      cvss31Data = {
-        version: "3.1",
-        vectorString: "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H",
-        baseScore: 9.8,
-        baseSeverity: "CRITICAL",
-        sourceType: "CNA Secondary",
-        sourceName: "Standard Baseline Vector"
-      };
-    }
-
     res.json({
-      success: true,
+      success: !unreachableError,
+      error: unreachableError,
       cve_id: cleanId,
       title,
       description,
       vuln_status: vulnStatus,
       is_nvd_assessed: nvdAssessed,
-      resolution_source: resolutionSource,
+      resolution_source: cvss31Data ? resolutionSource : "Unreachable",
       published_date: publishedDate,
       cvss_v31: cvss31Data,
       cvss_v40: cvss40Data
@@ -9013,6 +9009,121 @@ app.post("/api/v1/admin/shakedown/run", async (req, res) => {
         { check: "AIPatch jump host proxy and air-gapped agent config verified", passed: true, value: "Agent Config Validated" },
         { check: "Multi-engine selector supports both GovTech AI Platform and Google Gemini", passed: true, value: "Dual Engine Supported" }
       ],
+      timestamp
+    });
+
+    // 10. Live External URL Egress & Threat Feed Reachability Matrix
+    const netStart = Date.now();
+    const externalEndpoints = [
+      {
+        name: "NIST NVD API 2.0",
+        url: "https://services.nvd.nist.gov/rest/json/cves/2.0?resultsPerPage=1",
+        purpose: "Vulnerability catalog sync & official NVD CVSS 3.1/4.0 metrics",
+        category: "Threat Feeds"
+      },
+      {
+        name: "CVE.org / MITRE API",
+        url: "https://cveawg.mitre.org/api/cve/CVE-2024-3094",
+        purpose: "Authoritative CVE Services (Primary CNA & CISA ADP CVSS 3.1/4.0)",
+        category: "Threat Feeds"
+      },
+      {
+        name: "CISA KEV Catalog",
+        url: "https://www.cisa.gov/sites/default/files/feeds/known_exploited_vulnerabilities.json",
+        purpose: "Known Exploited Vulnerabilities catalog feed",
+        category: "Threat Feeds"
+      },
+      {
+        name: "FIRST.org EPSS API",
+        url: "https://api.first.org/data/v1/epss?cve=CVE-2024-3094",
+        purpose: "Exploit Prediction Scoring System probability scores",
+        category: "Threat Feeds"
+      },
+      {
+        name: "OSV.dev Vulnerability DB",
+        url: "https://api.osv.dev/v1/vulns/CVE-2024-3094",
+        purpose: "Open source vulnerability database & package ranges",
+        category: "Threat Feeds"
+      },
+      {
+        name: "EndOfLife.date API",
+        url: "https://endoflife.date/api/all.json",
+        purpose: "Software lifecycle, EOS, and EOL tracking",
+        category: "Lifecycle"
+      },
+      {
+        name: "Official NPM Registry",
+        url: "https://registry.npmjs.org/express",
+        purpose: "Node.js dependency resolution & updates",
+        category: "Package Mirrors"
+      },
+      {
+        name: "Python PyPI Registry",
+        url: "https://pypi.org/pypi/fastapi/json",
+        purpose: "Python package metadata & wheels",
+        category: "Package Mirrors"
+      },
+      {
+        name: "Google Gemini AI API",
+        url: "https://generativelanguage.googleapis.com",
+        purpose: "Generative AI patching agent & contextual advisories",
+        category: "Generative AI"
+      },
+      {
+        name: "GovTech AI Platform Gateway",
+        url: "https://api.ai.tech.gov.sg",
+        purpose: "Enterprise GovTech AI gateway (if enabled in settings)",
+        category: "Generative AI"
+      }
+    ];
+
+    const probePromises = externalEndpoints.map(async (ep) => {
+      const probeStart = Date.now();
+      try {
+        const controller = new AbortController();
+        const timeout = setTimeout(() => controller.abort(), 2500);
+        const probeRes = await fetch(ep.url, {
+          signal: controller.signal,
+          headers: { "User-Agent": "SecAdvisor-Shakedown-NetworkProbe/1.0" }
+        });
+        clearTimeout(timeout);
+        const latency = Date.now() - probeStart;
+        return {
+          ...ep,
+          passed: probeRes.status >= 200 && probeRes.status < 500, // Even 401/403/404 means network connectivity is open
+          status_code: probeRes.status,
+          latency_ms: latency,
+          error: null
+        };
+      } catch (err: any) {
+        return {
+          ...ep,
+          passed: false,
+          status_code: 0,
+          latency_ms: Date.now() - probeStart,
+          error: err.name === "AbortError" ? "Timed out (firewall packet drop)" : err.message
+        };
+      }
+    });
+
+    const probeResults = await Promise.all(probePromises);
+    const reachableCount = probeResults.filter(p => p.passed).length;
+    const allCrucialPassed = probeResults.filter(p => p.category === "Threat Feeds").every(p => p.passed);
+
+    testCases.push({
+      id: "CHK-NET-010",
+      category: "Network & URLs",
+      name: "Outbound Network Egress & Live External URLs Reachability Probe",
+      description: "Directly probes every external URL and threat feed used by the codebase to identify firewall, proxy, or DNS blocks.",
+      status: reachableCount >= 8 ? (reachableCount === externalEndpoints.length ? "PASSED" : "WARNING") : "FAILED",
+      duration_ms: Date.now() - netStart,
+      details: `Live URL probe tested ${externalEndpoints.length} external services. ${reachableCount}/${externalEndpoints.length} endpoints reachable. ` +
+        probeResults.map(p => `[${p.name}: ${p.passed ? `OK HTTP ${p.status_code}` : `BLOCKED (${p.error})`}]`).join(" "),
+      assertions: probeResults.map(p => ({
+        check: `${p.name} (${p.url.split('/')[2]})`,
+        passed: p.passed,
+        value: p.passed ? `Reachable (HTTP ${p.status_code}, ${p.latency_ms}ms)` : `BLOCKED / UNREACHABLE: ${p.error}`
+      })),
       timestamp
     });
 

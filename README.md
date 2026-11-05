@@ -165,7 +165,9 @@ If outbound Internet egress is restricted by an enterprise firewall, corporate p
 | **Python / PyPI** | `pypi.org` | `443` | TCP / HTTPS | **Mandatory** (Build) | Python Package Index index metadata |
 | **Python / PyPI** | `files.pythonhosted.org` | `443` | TCP / HTTPS | **Mandatory** (Build) | PyPI binary wheels and package source tarballs |
 | **Python / PyPI** | `pypi.python.org` | `443` | TCP / HTTPS | Recommended | Legacy PyPI HTTP-to-HTTPS redirect endpoint |
-| **Threat Intelligence** | `services.nvd.nist.gov` | `443` | TCP / HTTPS | **Mandatory** (Runtime) | NIST National Vulnerability Database API 2.0 (Worker CVE sync) |
+| **Threat Intelligence** | `services.nvd.nist.gov` | `443` | TCP / HTTPS | **Mandatory** (Runtime) | NIST National Vulnerability Database API 2.0 (Worker CVE sync & live CVSS) |
+| **Threat Intelligence** | `cveawg.mitre.org` | `443` | TCP / HTTPS | **Mandatory** (Runtime) | Official CVE.org / MITRE CVE Services API (Primary CNA & CISA ADP CVSS 3.1/4.0) |
+| **Threat Intelligence** | `www.cve.org` | `443` | TCP / HTTPS | Recommended | Official CVE.org Portal |
 | **Threat Intelligence** | `cve.mitre.org` | `443` | TCP / HTTPS | Recommended | MITRE CVE dictionary, CWE taxonomy, and vulnerability links |
 | **Threat Intelligence** | `api.github.com` | `443` | TCP / HTTPS | Recommended | GitHub Security Advisory Database feed |
 | **Threat Intelligence** | `www.cisa.gov` | `443` | TCP / HTTPS | Recommended | CISA Known Exploited Vulnerabilities (KEV) catalog |
@@ -239,6 +241,7 @@ Target Environment: Corporate VM / Docker Desktop / Cloud VPC
    - registry.npmjs.org, *.npmjs.org (Official Node.js NPM Registry)
    - pypi.org, files.pythonhosted.org (Python PyPI Registries)
    - services.nvd.nist.gov (NIST National Vulnerability Database API 2.0)
+   - cveawg.mitre.org, www.cve.org (Official CVE.org / MITRE CVE Services API)
    - generativelanguage.googleapis.com (Google Gemini AI Outbreak Advisor)
 
 3. OUTBOUND HTTPS (TCP 443) RULES - RECOMMENDED THREAT FEEDS:

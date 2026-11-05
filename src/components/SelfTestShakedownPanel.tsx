@@ -35,21 +35,21 @@ export default function SelfTestShakedownPanel({ userRole }: SelfTestShakedownPa
       setError("");
       setSuccessMsg("");
       setProgressPercent(10);
-      setCurrentStepText("1/8 Probing Core REST APIs & Microservices...");
+      setCurrentStepText("1/10 Probing Core REST APIs & Microservices...");
 
       const stepTimer1 = setTimeout(() => {
         setProgressPercent(30);
-        setCurrentStepText("3/8 Validating JWT, Roles & Active Directory LDAP Token...");
+        setCurrentStepText("3/10 Validating JWT, Roles & Active Directory LDAP Token...");
       }, 400);
 
       const stepTimer2 = setTimeout(() => {
         setProgressPercent(55);
-        setCurrentStepText("5/8 Testing Vulnerability Scoring, CISA KEV & Zero-Day Engine...");
+        setCurrentStepText("6/10 Testing Vulnerabilities, Zero-Day & Patch Tracker...");
       }, 800);
 
       const stepTimer3 = setTimeout(() => {
         setProgressPercent(80);
-        setCurrentStepText("7/8 Verifying EOS/EOL Boundaries & Patch Tracker 3-Point Dates...");
+        setCurrentStepText("9/10 Live Probing External Threat Feeds & URL Allowlist Matrix...");
       }, 1200);
 
       const res = await api.post<ShakedownSuiteResult>("/api/v1/admin/shakedown/run");
@@ -59,7 +59,7 @@ export default function SelfTestShakedownPanel({ userRole }: SelfTestShakedownPa
       clearTimeout(stepTimer3);
 
       setProgressPercent(100);
-      setCurrentStepText("8/8 All verification tests compiled successfully!");
+      setCurrentStepText("10/10 All subsystem tests and network probes completed!");
       setSuiteResult(res);
 
       if (!isInitial) {

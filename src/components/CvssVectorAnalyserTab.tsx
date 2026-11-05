@@ -31,6 +31,7 @@ import {
 
 interface ResolvedCveResponse {
   success: boolean;
+  error?: string;
   cve_id: string;
   title?: string;
   description?: string;
@@ -72,15 +73,6 @@ export default function CvssVectorAnalyserTab() {
   const [baseCvss40, setBaseCvss40] = useState<Cvss40Metrics | null>(null);
   const [rescoredCvss40, setRescoredCvss40] = useState<Cvss40Metrics | null>(null);
 
-  // Quick preset CVEs for fast testing
-  const presetCves = [
-    { id: "CVE-2024-3094", label: "XZ Utils (10.0 Critical)", desc: "Remote Backdoor" },
-    { id: "CVE-2024-38063", label: "Windows TCP/IP (9.8 Critical)", desc: "Zero-Click RCE" },
-    { id: "CVE-2024-21626", label: "runc Breakout (8.6 High)", desc: "Container Escape" },
-    { id: "CVE-2024-3400", label: "PAN-OS GlobalProtect (10.0)", desc: "Command Injection" },
-    { id: "CVE-2024-21413", label: "Outlook MonikerLink (9.8)", desc: "NTLM Credential Leak" }
-  ];
-
   // Fetch CVE live vectors on load or on user submit
   const fetchCveVectors = async (targetId: string) => {
     let clean = targetId.trim().toUpperCase();
@@ -89,6 +81,10 @@ export default function CvssVectorAnalyserTab() {
 
     setLoading(true);
     setError(null);
+    setBaseCvss31(null);
+    setBaseCvss40(null);
+    setRescoredCvss31(null);
+    setRescoredCvss40(null);
 
     try {
       const res = await fetch(`/api/v1/cvss/resolve?cve_id=${encodeURIComponent(clean)}`);
@@ -97,6 +93,11 @@ export default function CvssVectorAnalyserTab() {
       }
       const data: ResolvedCveResponse = await res.json();
       setCveDetails(data);
+
+      if (data.error || !data.cvss_v31) {
+        setError(data.error || `Could not resolve live CVSS vector for ${clean} from NVD or CVE.org.`);
+        return;
+      }
 
       // Process CVSS 3.1
       if (data.cvss_v31 && data.cvss_v31.vectorString) {
@@ -121,16 +122,6 @@ export default function CvssVectorAnalyserTab() {
           const synth40 = synthesizeCvss40From31(full31);
           setBaseCvss40(synth40);
         }
-      } else {
-        // Fallback default
-        const parsed31 = parseCvss31Vector("CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H");
-        const full31: Cvss31Metrics = {
-          ...parsed31,
-          sourceType: "CNA Secondary",
-          sourceName: "Standard Baseline"
-        };
-        setBaseCvss31(full31);
-        setBaseCvss40(synthesizeCvss40From31(full31));
       }
     } catch (err: any) {
       setError(err.message || "Failed to resolve CVE from NVD and CVE.org");
@@ -197,28 +188,6 @@ export default function CvssVectorAnalyserTab() {
                 </p>
               </div>
             </div>
-          </div>
-
-          {/* Quick Presets */}
-          <div className="flex items-center gap-2 flex-wrap">
-            <span className="text-xs font-semibold text-slate-400">Presets:</span>
-            {presetCves.map((p) => (
-              <button
-                key={p.id}
-                onClick={() => {
-                  setCveInput(p.id);
-                  fetchCveVectors(p.id);
-                }}
-                className={`text-xs px-2.5 py-1 rounded-lg border font-mono font-medium transition-all cursor-pointer ${
-                  cveInput.toUpperCase() === p.id
-                    ? "bg-indigo-600 text-white border-indigo-600 shadow-xs"
-                    : "bg-slate-50 text-slate-600 border-slate-200 hover:bg-slate-100"
-                }`}
-                title={p.desc}
-              >
-                {p.id}
-              </button>
-            ))}
           </div>
         </div>
 
