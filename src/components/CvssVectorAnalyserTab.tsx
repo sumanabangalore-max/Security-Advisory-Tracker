@@ -38,6 +38,7 @@ interface ResolvedCveResponse {
   vuln_status?: string;
   is_nvd_assessed?: boolean;
   resolution_source?: string;
+  attempted_sources?: string[];
   published_date?: string;
   cvss_v31?: {
     version: "3.1";
@@ -271,9 +272,32 @@ export default function CvssVectorAnalyserTab() {
         </form>
 
         {error && (
-          <div className="mt-4 p-3 bg-rose-50 border border-rose-200 rounded-xl text-rose-700 text-xs flex items-center gap-2">
-            <AlertTriangle className="h-4 w-4 shrink-0 text-rose-500" />
-            <span>{error}</span>
+          <div className="mt-4 p-4 bg-amber-50 border border-amber-300 rounded-xl text-amber-900 text-xs space-y-2">
+            <div className="flex items-start gap-2.5">
+              <AlertTriangle className="h-4 w-4 shrink-0 text-amber-600 mt-0.5" />
+              <div className="space-y-1">
+                <span className="font-bold text-amber-950 block">External Threat Intelligence Feeds Unreachable</span>
+                <p className="leading-relaxed">{error}</p>
+              </div>
+            </div>
+            {cveDetails?.attempted_sources && cveDetails.attempted_sources.length > 0 && (
+              <div className="mt-2 pt-2 border-t border-amber-200/80 text-[11px] text-amber-800">
+                <span className="font-semibold block mb-1">Endpoints probed from container:</span>
+                <div className="flex flex-wrap gap-1.5 font-mono">
+                  {cveDetails.attempted_sources.map((src, i) => (
+                    <span key={i} className="px-2 py-0.5 bg-amber-100 rounded border border-amber-200">
+                      {src}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            )}
+            <div className="pt-2 text-[11px] text-amber-700 flex items-center gap-1.5">
+              <Info className="h-3.5 w-3.5 shrink-0 text-amber-600" />
+              <span>
+                Tip: Run the <strong>Administration ➔ Self Test / Shakedown</strong> suite to test live container socket egress to all required endpoints.
+              </span>
+            </div>
           </div>
         )}
       </div>
