@@ -6,6 +6,182 @@ import { WebSocketServer, WebSocket } from "ws";
 import * as xlsx from "xlsx";
 import { GoogleGenAI } from "@google/genai";
 import nodemailer from "nodemailer";
+import https from "https";
+import { URL } from "url";
+
+// =========================================================================
+// Enterprise Proxy & Outbound Egress Interceptor
+// Node.js native global.fetch() does NOT automatically honor HTTP_PROXY / HTTPS_PROXY.
+// This wrapper tunnels HTTPS traffic via HTTP CONNECT through the corporate proxy,
+// allowing Docker containers to reach NIST NVD, CVE.org, CISA, EPSS, etc.
+// =========================================================================
+(() => {
+  const originalFetch = global.fetch;
+  if (!originalFetch) return;
+
+  global.fetch = async function corporateProxyAwareFetch(resource: any, init: any = {}) {
+    const urlStr = typeof resource === "string" ? resource : (resource?.url || String(resource));
+    const proxyUrlStr = process.env.HTTPS_PROXY || process.env.HTTP_PROXY || process.env.https_proxy || process.env.http_proxy;
+
+    if (!proxyUrlStr || !urlStr.startsWith("http")) {
+      return originalFetch(resource, init);
+    }
+
+    try {
+      const parsed = new URL(urlStr);
+      const noProxy = process.env.NO_PROXY || process.env.no_proxy || "";
+      const isNoProxy = noProxy.split(",").some((pattern) => {
+        const p = pattern.trim().toLowerCase();
+        if (!p) return false;
+        if (p === "*") return true;
+        const host = parsed.hostname.toLowerCase();
+        return host === p || host.endsWith("." + p);
+      });
+
+      if (isNoProxy) {
+        return originalFetch(resource, init);
+      }
+
+      // Proxy outbound request via HTTP CONNECT tunnel for HTTPS or regular proxy for HTTP
+      return await new Promise<Response>((resolve, reject) => {
+        const isHttps = parsed.protocol === "https:";
+        const proxyParsed = new URL(proxyUrlStr);
+        const headers: Record<string, string> = {};
+
+        // Copy input headers
+        if (init.headers) {
+          if (typeof init.headers.forEach === "function") {
+            init.headers.forEach((val: string, key: string) => { headers[key] = val; });
+          } else if (Array.isArray(init.headers)) {
+            init.headers.forEach(([k, v]: [string, string]) => { headers[k] = v; });
+          } else {
+            Object.assign(headers, init.headers);
+          }
+        }
+
+        if (!headers["User-Agent"] && !headers["user-agent"]) {
+          headers["User-Agent"] = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/128.0.0.0 Safari/537.36";
+        }
+        if (!headers["Accept"] && !headers["accept"]) {
+          headers["Accept"] = "application/json, text/plain, */*";
+        }
+
+        const method = (init.method || "GET").toUpperCase();
+
+        if (isHttps) {
+          const proxyPort = parseInt(proxyParsed.port || (proxyParsed.protocol === "https:" ? "443" : "8080"), 10);
+          const connectReq = http.request({
+            host: proxyParsed.hostname,
+            port: proxyPort,
+            method: "CONNECT",
+            path: `${parsed.hostname}:${parsed.port || 443}`,
+            headers: {
+              "Host": `${parsed.hostname}:${parsed.port || 443}`,
+              "User-Agent": headers["User-Agent"]
+            }
+          });
+
+          if (init.signal) {
+            init.signal.addEventListener("abort", () => {
+              connectReq.destroy(new Error("Request aborted"));
+            });
+          }
+
+          connectReq.on("connect", (res, socket, head) => {
+            if (res.statusCode !== 200) {
+              socket.destroy();
+              return reject(new Error(`Corporate proxy rejected CONNECT to ${parsed.hostname} with HTTP ${res.statusCode}`));
+            }
+
+            const tlsReq = https.request({
+              createConnection: () => socket,
+              host: parsed.hostname,
+              port: parsed.port ? String(parsed.port) : "443",
+              path: parsed.pathname + parsed.search,
+              method: method,
+              headers: headers,
+                            agent: false
+            }, (tlsRes) => {
+              const chunks: Buffer[] = [];
+              tlsRes.on("data", (chunk) => chunks.push(chunk));
+              tlsRes.on("end", () => {
+                const bodyBuffer = Buffer.concat(chunks);
+                const responseHeaders = new Headers();
+                for (const [k, v] of Object.entries(tlsRes.headers)) {
+                  if (Array.isArray(v)) {
+                    v.forEach((val) => responseHeaders.append(k, val));
+                  } else if (v !== undefined) {
+                    responseHeaders.set(k, v);
+                  }
+                }
+                const customResponse = new Response(bodyBuffer, {
+                  status: tlsRes.statusCode || 200,
+                  statusText: tlsRes.statusMessage || "OK",
+                  headers: responseHeaders
+                });
+                resolve(customResponse);
+              });
+            });
+
+            if (init.signal) {
+              init.signal.addEventListener("abort", () => {
+                tlsReq.destroy(new Error("Request aborted"));
+              });
+            }
+
+            tlsReq.on("error", reject);
+            if (init.body) {
+              tlsReq.write(init.body);
+            }
+            tlsReq.end();
+          });
+
+          connectReq.on("error", reject);
+          connectReq.end();
+        } else {
+          // Plain HTTP proxying
+          const proxyPort = parseInt(proxyParsed.port || "8080", 10);
+          const req = http.request({
+            host: proxyParsed.hostname,
+            port: proxyPort,
+            method: method,
+            path: urlStr,
+            headers: headers
+          }, (res) => {
+            const chunks: Buffer[] = [];
+            res.on("data", (chunk) => chunks.push(chunk));
+            res.on("end", () => {
+              const bodyBuffer = Buffer.concat(chunks);
+              const responseHeaders = new Headers();
+              for (const [k, v] of Object.entries(res.headers)) {
+                if (v !== undefined) responseHeaders.set(k, Array.isArray(v) ? v.join(", ") : v);
+              }
+              resolve(new Response(bodyBuffer, {
+                status: res.statusCode || 200,
+                statusText: res.statusMessage || "OK",
+                headers: responseHeaders
+              }));
+            });
+          });
+
+          if (init.signal) {
+            init.signal.addEventListener("abort", () => {
+              req.destroy(new Error("Request aborted"));
+            });
+          }
+
+          req.on("error", reject);
+          if (init.body) req.write(init.body);
+          req.end();
+        }
+      });
+    } catch (proxyErr) {
+      // If parsing fails, fall back to default
+      return originalFetch(resource, init);
+    }
+  };
+})();
+
 import {
   resolveVendorPatch,
   syncLiveVendorReleases,
@@ -4700,7 +4876,7 @@ app.get("/api/v1/cvss/resolve", async (req, res) => {
           version: "3.1",
           vectorString: existing.cvss_vector,
           baseScore: existing.cvss_score || 7.5,
-          baseSeverity: (existing as any).severity || "HIGH",
+          baseSeverity: ((existing as any).severity || "HIGH"),
           sourceType: "CNA Secondary",
           sourceName: existing.source || "Inventory Cache"
         };

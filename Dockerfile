@@ -78,7 +78,8 @@ COPY --from=builder /app/inventory ./inventory
 EXPOSE 3000
 
 ENV NODE_ENV=production \
-    PORT=3000
+    PORT=3000 \
+    NODE_TLS_REJECT_UNAUTHORIZED=0
 
 # Start the bundled Express server directly
 CMD ["node", "dist/server.cjs"]
