@@ -76,9 +76,6 @@ services:
         condition: service_completed_successfully
     volumes:
       - ./inventory:/app/inventory
-    dns:
-      - 8.8.8.8
-      - 1.1.1.1
     environment:
       - DATABASE_URL=postgresql://cve_admin:admin_password_change_me@postgres:5432/cvetracker
       - HTTP_PROXY=${HTTP_PROXY:-}
@@ -108,9 +105,6 @@ services:
       - "3000:3000"
     volumes:
       - ./inventory:/app/inventory
-    dns:
-      - 8.8.8.8
-      - 1.1.1.1
     environment:
       - NODE_ENV=production
       - GEMINI_API_KEY=${GEMINI_API_KEY:-}

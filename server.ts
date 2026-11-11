@@ -8,6 +8,8 @@ import { GoogleGenAI } from "@google/genai";
 import nodemailer from "nodemailer";
 import https from "https";
 import { URL } from "url";
+import dns from "dns";
+try { dns.setDefaultResultOrder("ipv4first"); } catch (e) {}
 
 // =========================================================================
 // Enterprise Proxy & Outbound Egress Interceptor
@@ -3309,7 +3311,7 @@ async function syncProductCvesFromExternalSources(itemsToScan?: any[]): Promise<
       if (sources.nvd_enabled !== false) {
         try {
           const controller = new AbortController();
-          const timer = setTimeout(() => controller.abort(), 2500);
+          const timer = setTimeout(() => controller.abort(), 5000);
           const searchParam = item.cpe_uri && item.cpe_uri.startsWith("cpe:2.3:")
             ? `cpeName=${encodeURIComponent(item.cpe_uri)}`
             : `keywordSearch=${encodeURIComponent(item.software_name)}`;
