@@ -22,7 +22,7 @@ The application consists of five Docker services defined in `docker-compose.yml`
 | **bootstrap** | `cve-tracker-bootstrap` | One-shot job syncing inventory files from the `inventory/` directory | - |
 | **backend** | `cve-tracker-api` | Python FastAPI REST & WebSocket server | `8000` |
 | **worker** | `cve-tracker-worker` | Python background worker syncing NVD CVEs every 24 hours | - |
-| **frontend** | `cve-tracker-ui` | React + TypeScript + Tailwind single page application served by nginx | `5173` |
+| **frontend** | `cve-tracker-ui` | Full-stack React + TypeScript UI & Express API server (`dist/server.cjs`) | `3000` |
 
 ---
 
@@ -168,11 +168,13 @@ If outbound Internet egress is restricted by an enterprise firewall, corporate p
 | **Threat Intelligence** | `services.nvd.nist.gov` | `443` | TCP / HTTPS | **Mandatory** (Runtime) | NIST National Vulnerability Database API 2.0 (Worker CVE sync & live CVSS) |
 | **Threat Intelligence** | `cveawg.mitre.org` | `443` | TCP / HTTPS | **Mandatory** (Runtime) | Official CVE.org / MITRE CVE Services API (Primary CNA & CISA ADP CVSS 3.1/4.0) |
 | **Threat Intelligence** | `www.cve.org` | `443` | TCP / HTTPS | Recommended | Official CVE.org Portal |
+| **Threat Intelligence** | `raw.githubusercontent.com` | `443` | TCP / HTTPS | **Mandatory** (Runtime) | CVEProject cvelistV5 JSON git mirror & CISA KEV catalog feed |
+| **Threat Intelligence** | `api.osv.dev` | `443` | TCP / HTTPS | **Mandatory** (Runtime) | Open Source Vulnerability (OSV.dev) database & package ranges |
+| **Threat Intelligence** | `www.cisa.gov` | `443` | TCP / HTTPS | Recommended | CISA Known Exploited Vulnerabilities (KEV) catalog |
+| **Threat Intelligence** | `api.first.org` | `443` | TCP / HTTPS | Recommended | FIRST.org Exploit Prediction Scoring System (EPSS) API |
 | **Threat Intelligence** | `cve.mitre.org` | `443` | TCP / HTTPS | Recommended | MITRE CVE dictionary, CWE taxonomy, and vulnerability links |
 | **Threat Intelligence** | `api.github.com` | `443` | TCP / HTTPS | Recommended | GitHub Security Advisory Database feed |
-| **Threat Intelligence** | `www.cisa.gov` | `443` | TCP / HTTPS | Recommended | CISA Known Exploited Vulnerabilities (KEV) catalog |
-| **Threat Intelligence** | `raw.githubusercontent.com` | `443` | TCP / HTTPS | Recommended | CISA KEV JSON mirror & community vulnerability catalogs |
-| **Threat Intelligence** | `api.first.org` | `443` | TCP / HTTPS | Recommended | FIRST.org Exploit Prediction Scoring System (EPSS) API |
+| **Software Lifecycle** | `endoflife.date` | `443` | TCP / HTTPS | **Mandatory** (Runtime) | EndOfLife.date API (Software & OS Lifecycle, EOS/EOL tracking) |
 | **Generative AI** | `generativelanguage.googleapis.com` | `443` | TCP / HTTPS | Recommended (AI) | Google Gemini API (autonomous AI Patching Agent & advisories) |
 | **Generative AI** | `api.ai.tech.gov.sg` | `443` | TCP / HTTPS | Optional (GovTech) | Platform AI GovTech API gateway (if configured in AI settings) |
 | **Azure CI/CD & ACR** | `dev.azure.com` | `443` | TCP / HTTPS | Optional (Azure) | Azure DevOps project repositories and build pipelines |
@@ -242,11 +244,14 @@ Target Environment: Corporate VM / Docker Desktop / Cloud VPC
    - pypi.org, files.pythonhosted.org (Python PyPI Registries)
    - services.nvd.nist.gov (NIST National Vulnerability Database API 2.0)
    - cveawg.mitre.org, www.cve.org (Official CVE.org / MITRE CVE Services API)
+   - raw.githubusercontent.com (CVEProject cvelistV5 Daily Mirror & CISA KEV JSON)
+   - api.osv.dev (OSV.dev Open Source Vulnerability Database)
+   - endoflife.date (EndOfLife.date Lifecycle & EOS/EOL Tracking)
    - generativelanguage.googleapis.com (Google Gemini AI Outbreak Advisor)
 
 3. OUTBOUND HTTPS (TCP 443) RULES - RECOMMENDED THREAT FEEDS:
    - cve.mitre.org (MITRE CVE reference links)
-   - api.github.com, raw.githubusercontent.com (GitHub Security Feeds)
+   - api.github.com (GitHub Security Feeds)
    - www.cisa.gov, api.first.org (CISA KEV Catalog & FIRST EPSS Scoring)
 
 4. OPTIONAL OUTBOUND INTEGRATION RULES (If configured in dashboard):
@@ -254,9 +259,10 @@ Target Environment: Corporate VM / Docker Desktop / Cloud VPC
    - TCP 25/587/465 -> Corporate SMTP Server (Security Alert Email Delivery)
    - TCP 389/636 -> Active Directory Domain Controllers (LDAP/LDAPS SSO)
    - TCP/UDP 514 / TLS 6514 -> Corporate SIEM (Splunk / Sentinel Syslog)
+   - TCP 443 -> api.ai.tech.gov.sg (GovTech AI Platform Gateway)
 
-5. PROXY BYPASS LIST:
-   - localhost, 127.0.0.1, postgres, backend, worker, 172.16.0.0/12
+5. PROXY BYPASS LIST (NO_PROXY):
+   - localhost, 127.0.0.1, postgres, backend, worker, bootstrap, 172.16.0.0/12, 10.0.0.0/8
 ================================================================================
 ```
 

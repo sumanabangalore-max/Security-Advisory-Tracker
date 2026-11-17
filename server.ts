@@ -190,6 +190,13 @@ import {
   loadVendorReleasesCache,
   compareSemver
 } from "./vendorReleases";
+import {
+  extractFromNvdConfigurations,
+  extractFromCve5Affected,
+  extractFromOsvAffected,
+  mergeAffectedProducts,
+  AffectedSourcesStatus
+} from "./affectedProducts";
 
 const app = express();
 const PORT = 3000;
@@ -4643,8 +4650,8 @@ app.patch("/api/v1/vulnerabilities/:id/status", (req, res) => {
   res.json(vuln);
 });
 
-// Live CVSS Vector and Score Resolver for CVSS Vector Analyser
-// Fetches live from NVD (Primary NVD score first, then CNA score via NVD, or falls back to CVE.org / MITRE API)
+// Live CVSS Vector, Score & Affected Products Resolver for CVSS Vector Analyser
+// Purely deterministic API calls (NO AI): NVD (CPE list) -> CNA (CVE.org) -> CISA (ADP) -> OSV
 app.get("/api/v1/cvss/resolve", async (req, res) => {
   const rawId = req.query.cve_id as string;
   if (!rawId) return res.status(400).json({ detail: "Query parameter cve_id is required" });
@@ -4662,8 +4669,7 @@ app.get("/api/v1/cvss/resolve", async (req, res) => {
     let resolutionSource: "NVD" | "CVE.org" | "CVEProject (GitHub)" | "OSV.dev" | "Mock/Cache" = "NVD";
     const attemptedSources: string[] = [];
 
-    // Helper fetch with timeout and browser-like user agent
-    const fetchWithTimeout = async (url: string, timeoutMs = 5000) => {
+    const fetchWithTimeout = async (url: string, timeoutMs = 5500, extraHeaders: Record<string, string> = {}) => {
       const controller = new AbortController();
       const timer = setTimeout(() => controller.abort(), timeoutMs);
       try {
@@ -4671,7 +4677,8 @@ app.get("/api/v1/cvss/resolve", async (req, res) => {
           signal: controller.signal,
           headers: {
             "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/128.0.0.0 Safari/537.36",
-            "Accept": "application/json, text/plain, */*"
+            "Accept": "application/json, text/plain, */*",
+            ...extraHeaders
           }
         });
         clearTimeout(timer);
@@ -4682,26 +4689,50 @@ app.get("/api/v1/cvss/resolve", async (req, res) => {
       }
     };
 
-    // 1. Primary: Query NIST NVD API 2.0 (services.nvd.nist.gov)
-    try {
-      const nvdRes = await fetchWithTimeout(`https://services.nvd.nist.gov/rest/json/cves/2.0?cveId=${encodeURIComponent(cleanId)}`, 4500);
+    const nvdHeaders: Record<string, string> = {};
+    if (process.env.NVD_API_KEY) {
+      nvdHeaders["apiKey"] = process.env.NVD_API_KEY;
+    }
+
+    // Fetch all official APIs in parallel (deterministic API calls only — zero AI calls)
+    const [nvdSettled, cveOrgSettled, osvSettled] = await Promise.allSettled([
+      fetchWithTimeout(`https://services.nvd.nist.gov/rest/json/cves/2.0?cveId=${encodeURIComponent(cleanId)}`, 6000, nvdHeaders),
+      fetchWithTimeout(`https://cveawg.mitre.org/api/cve/${encodeURIComponent(cleanId)}`, 5500),
+      fetchWithTimeout(`https://api.osv.dev/v1/vulns/${encodeURIComponent(cleanId)}`, 4500)
+    ]);
+
+    let nvdItem: any = null;
+    let cveOrgJson: any = null;
+    let osvJson: any = null;
+
+    const affectedSourcesStatus: AffectedSourcesStatus = {
+      nvd: { checked: true, reachable: false, count: 0 },
+      cna: { checked: true, reachable: false, count: 0 },
+      cisa: { checked: true, reachable: false, count: 0 },
+      osv: { checked: true, reachable: false, count: 0 }
+    };
+
+    // 1. Parse NVD API 2.0 response
+    if (nvdSettled.status === "fulfilled") {
+      const nvdRes = nvdSettled.value;
       attemptedSources.push(`services.nvd.nist.gov (HTTP ${nvdRes.status})`);
       if (nvdRes.ok) {
+        affectedSourcesStatus.nvd.reachable = true;
         const nvdJson: any = await nvdRes.json();
-        const item = nvdJson?.vulnerabilities?.[0]?.cve;
-        if (item) {
-          vulnStatus = item.vulnStatus || "Awaiting Analysis";
+        nvdItem = nvdJson?.vulnerabilities?.[0]?.cve || null;
+        if (nvdItem) {
+          vulnStatus = nvdItem.vulnStatus || "Awaiting Analysis";
           nvdAssessed = vulnStatus === "Analyzed" || vulnStatus === "Modified";
-          publishedDate = item.published || "";
-          const descObj = item.descriptions?.find((d: any) => d.lang === "en") || item.descriptions?.[0];
+          publishedDate = nvdItem.published || "";
+          const descObj = nvdItem.descriptions?.find((d: any) => d.lang === "en") || nvdItem.descriptions?.[0];
           if (descObj?.value) description = descObj.value;
 
-          const metrics = item.metrics || {};
+          const metrics = nvdItem.metrics || {};
           const v31List = metrics.cvssMetricV31 || [];
           const primaryV31 = v31List.find((m: any) => m.type === "Primary");
           const secondaryV31 = v31List.find((m: any) => m.type === "Secondary") || v31List[0];
           const chosenV31 = primaryV31 || secondaryV31;
-          if (chosenV31 && chosenV31.cvssData && chosenV31.cvssData.vectorString) {
+          if (chosenV31?.cvssData?.vectorString) {
             cvss31Data = {
               version: "3.1",
               vectorString: chosenV31.cvssData.vectorString,
@@ -4717,7 +4748,7 @@ app.get("/api/v1/cvss/resolve", async (req, res) => {
           const primaryV40 = v40List.find((m: any) => m.type === "Primary");
           const secondaryV40 = v40List.find((m: any) => m.type === "Secondary") || v40List[0];
           const chosenV40 = primaryV40 || secondaryV40;
-          if (chosenV40 && chosenV40.cvssData && chosenV40.cvssData.vectorString) {
+          if (chosenV40?.cvssData?.vectorString) {
             cvss40Data = {
               version: "4.0",
               vectorString: chosenV40.cvssData.vectorString,
@@ -4729,60 +4760,24 @@ app.get("/api/v1/cvss/resolve", async (req, res) => {
           }
         }
       }
-    } catch (e: any) {
-      attemptedSources.push(`services.nvd.nist.gov (${e.name === "AbortError" ? "timeout" : e.message})`);
+    } else {
+      const e = nvdSettled.reason;
+      attemptedSources.push(`services.nvd.nist.gov (${e?.name === "AbortError" ? "timeout" : e?.message || "error"})`);
     }
 
-    // 2. Secondary: Official CVE.org / MITRE Services API (cveawg.mitre.org)
-    if (!cvss31Data || !cvss40Data) {
-      try {
-        const cveOrgRes = await fetchWithTimeout(`https://cveawg.mitre.org/api/cve/${encodeURIComponent(cleanId)}`, 4500);
-        attemptedSources.push(`cveawg.mitre.org (HTTP ${cveOrgRes.status})`);
-        if (cveOrgRes.ok) {
-          const cveOrgJson: any = await cveOrgRes.json();
-          const cna = cveOrgJson?.containers?.cna;
-          if (cna) {
-            if (!title && cna.title) title = cna.title;
-            if (!description && cna.descriptions?.[0]?.value) description = cna.descriptions[0].value;
-            const cnaAssigner = cveOrgJson.cveMetadata?.assignerShortName || "Primary CNA";
-
-            const allMetrics = [
-              ...(cna.metrics || []),
-              ...((cveOrgJson?.containers?.adp || []).flatMap((adp: any) => adp.metrics || []))
-            ];
-
-            for (const m of allMetrics) {
-              if (m.cvssV3_1 && !cvss31Data) {
-                cvss31Data = {
-                  version: "3.1",
-                  vectorString: m.cvssV3_1.vectorString,
-                  baseScore: m.cvssV3_1.baseScore,
-                  baseSeverity: m.cvssV3_1.baseSeverity || "HIGH",
-                  sourceType: "CVE.org (Primary CNA)",
-                  sourceName: `${cnaAssigner.toUpperCase()} via CVE.org`
-                };
-                resolutionSource = "CVE.org";
-              }
-              if (m.cvssV4_0 && !cvss40Data) {
-                cvss40Data = {
-                  version: "4.0",
-                  vectorString: m.cvssV4_0.vectorString,
-                  baseScore: m.cvssV4_0.baseScore,
-                  baseSeverity: m.cvssV4_0.baseSeverity || "HIGH",
-                  sourceType: "CVE.org (Primary CNA)",
-                  sourceName: `${cnaAssigner.toUpperCase()} via CVE.org`
-                };
-              }
-            }
-          }
-        }
-      } catch (e: any) {
-        attemptedSources.push(`cveawg.mitre.org (${e.name === "AbortError" ? "timeout" : e.message})`);
+    // 2. Parse CVE.org / MITRE Services API (with CVEProject GitHub cvelistV5 fallback if CVE.org failed)
+    if (cveOrgSettled.status === "fulfilled") {
+      const cveOrgRes = cveOrgSettled.value;
+      attemptedSources.push(`cveawg.mitre.org (HTTP ${cveOrgRes.status})`);
+      if (cveOrgRes.ok) {
+        cveOrgJson = await cveOrgRes.json();
       }
+    } else {
+      const e = cveOrgSettled.reason;
+      attemptedSources.push(`cveawg.mitre.org (${e?.name === "AbortError" ? "timeout" : e?.message || "error"})`);
     }
 
-    // 3. Tertiary: Official CVEProject GitHub Mirror (raw.githubusercontent.com - CDN-backed mirror of cve.org)
-    if (!cvss31Data || !cvss40Data) {
+    if (!cveOrgJson) {
       try {
         const parts = cleanId.split("-");
         if (parts.length === 3) {
@@ -4793,42 +4788,7 @@ app.get("/api/v1/cvss/resolve", async (req, res) => {
           const ghRes = await fetchWithTimeout(ghUrl, 4500);
           attemptedSources.push(`raw.githubusercontent.com/CVEProject (HTTP ${ghRes.status})`);
           if (ghRes.ok) {
-            const ghJson: any = await ghRes.json();
-            const cna = ghJson?.containers?.cna;
-            if (cna) {
-              if (!title && cna.title) title = cna.title;
-              if (!description && cna.descriptions?.[0]?.value) description = cna.descriptions[0].value;
-              const cnaAssigner = ghJson.cveMetadata?.assignerShortName || "Primary CNA";
-
-              const allMetrics = [
-                ...(cna.metrics || []),
-                ...((ghJson?.containers?.adp || []).flatMap((adp: any) => adp.metrics || []))
-              ];
-
-              for (const m of allMetrics) {
-                if (m.cvssV3_1 && !cvss31Data) {
-                  cvss31Data = {
-                    version: "3.1",
-                    vectorString: m.cvssV3_1.vectorString,
-                    baseScore: m.cvssV3_1.baseScore,
-                    baseSeverity: m.cvssV3_1.baseSeverity || "HIGH",
-                    sourceType: "CVE.org (Primary CNA)",
-                    sourceName: `${cnaAssigner.toUpperCase()} (cvelistV5)`
-                  };
-                  resolutionSource = "CVE.org";
-                }
-                if (m.cvssV4_0 && !cvss40Data) {
-                  cvss40Data = {
-                    version: "4.0",
-                    vectorString: m.cvssV4_0.vectorString,
-                    baseScore: m.cvssV4_0.baseScore,
-                    baseSeverity: m.cvssV4_0.baseSeverity || "HIGH",
-                    sourceType: "CVE.org (Primary CNA)",
-                    sourceName: `${cnaAssigner.toUpperCase()} (cvelistV5)`
-                  };
-                }
-              }
-            }
+            cveOrgJson = await ghRes.json();
           }
         }
       } catch (e: any) {
@@ -4836,15 +4796,70 @@ app.get("/api/v1/cvss/resolve", async (req, res) => {
       }
     }
 
-    // 4. Quaternary: OSV.dev Open Source Vulnerability Database (api.osv.dev)
-    if (!cvss31Data) {
-      try {
-        const osvRes = await fetchWithTimeout(`https://api.osv.dev/v1/vulns/${encodeURIComponent(cleanId)}`, 4000);
-        attemptedSources.push(`api.osv.dev (HTTP ${osvRes.status})`);
-        if (osvRes.ok) {
-          const osvJson: any = await osvRes.json();
-          if (osvJson && osvJson.id) {
-            if (!description && (osvJson.summary || osvJson.details)) description = osvJson.summary || osvJson.details;
+    if (cveOrgJson?.containers?.cna) {
+      affectedSourcesStatus.cna.reachable = true;
+      const cna = cveOrgJson.containers.cna;
+      const adps = Array.isArray(cveOrgJson?.containers?.adp) ? cveOrgJson.containers.adp : [];
+      const hasCisaAdp = adps.some((a: any) =>
+        String(a?.providerMetadata?.shortName || "").toUpperCase().includes("CISA") ||
+        String(a?.title || "").toUpperCase().includes("CISA")
+      );
+      if (hasCisaAdp || adps.length > 0) {
+        affectedSourcesStatus.cisa.reachable = true;
+      }
+
+      if (!title && cna.title) title = cna.title;
+      if (!description && cna.descriptions?.[0]?.value) description = cna.descriptions[0].value;
+      if (!publishedDate && cveOrgJson?.cveMetadata?.datePublished) {
+        publishedDate = cveOrgJson.cveMetadata.datePublished;
+      }
+
+      if (!cvss31Data || !cvss40Data) {
+        const cnaAssigner = cveOrgJson.cveMetadata?.assignerShortName || "Primary CNA";
+        const allMetrics = [
+          ...(cna.metrics || []),
+          ...adps.flatMap((adp: any) => adp.metrics || [])
+        ];
+        for (const m of allMetrics) {
+          if (m.cvssV3_1 && !cvss31Data) {
+            cvss31Data = {
+              version: "3.1",
+              vectorString: m.cvssV3_1.vectorString,
+              baseScore: m.cvssV3_1.baseScore,
+              baseSeverity: m.cvssV3_1.baseSeverity || "HIGH",
+              sourceType: "CVE.org (Primary CNA)",
+              sourceName: `${cnaAssigner.toUpperCase()} via CVE.org`
+            };
+            if (!nvdItem) resolutionSource = "CVE.org";
+          }
+          if (m.cvssV4_0 && !cvss40Data) {
+            cvss40Data = {
+              version: "4.0",
+              vectorString: m.cvssV4_0.vectorString,
+              baseScore: m.cvssV4_0.baseScore,
+              baseSeverity: m.cvssV4_0.baseSeverity || "HIGH",
+              sourceType: "CVE.org (Primary CNA)",
+              sourceName: `${cnaAssigner.toUpperCase()} via CVE.org`
+            };
+          }
+        }
+      }
+    }
+
+    // 3. Parse OSV.dev response
+    if (osvSettled.status === "fulfilled") {
+      const osvRes = osvSettled.value;
+      attemptedSources.push(`api.osv.dev (HTTP ${osvRes.status})`);
+      if (osvRes.ok || osvRes.status === 404) {
+        affectedSourcesStatus.osv.reachable = true;
+      }
+      if (osvRes.ok) {
+        osvJson = await osvRes.json();
+        if (osvJson && osvJson.id) {
+          if (!description && (osvJson.summary || osvJson.details)) {
+            description = osvJson.summary || osvJson.details;
+          }
+          if (!cvss31Data) {
             const sevList = osvJson.severity || [];
             for (const s of sevList) {
               if (s.type === "CVSS_V3" && s.score && s.score.startsWith("CVSS:3")) {
@@ -4862,10 +4877,43 @@ app.get("/api/v1/cvss/resolve", async (req, res) => {
             }
           }
         }
-      } catch (e: any) {
-        attemptedSources.push(`api.osv.dev (${e.name === "AbortError" ? "timeout" : e.message})`);
       }
+    } else {
+      const e = osvSettled.reason;
+      attemptedSources.push(`api.osv.dev (${e?.name === "AbortError" ? "timeout" : e?.message || "error"})`);
     }
+
+    // 4. Extract & merge Affected Products strictly in order:
+    //    NVD (CPE list) -> CNA (CVE.org) -> CISA (ADP) -> OSV (open-source packages)
+    const nvdAffected = nvdItem?.configurations
+      ? extractFromNvdConfigurations(nvdItem.configurations)
+      : [];
+    const cnaAffected = cveOrgJson?.containers?.cna?.affected
+      ? extractFromCve5Affected(cveOrgJson.containers.cna.affected, "CNA")
+      : [];
+    const cisaAdps = (Array.isArray(cveOrgJson?.containers?.adp) ? cveOrgJson.containers.adp : []).filter(
+      (a: any) =>
+        String(a?.providerMetadata?.shortName || "").toUpperCase().includes("CISA") ||
+        String(a?.title || "").toUpperCase().includes("CISA")
+    );
+    const cisaAffected = cisaAdps.flatMap((a: any) =>
+      extractFromCve5Affected(a?.affected || [], "CISA")
+    );
+    const osvAffected = osvJson?.affected
+      ? extractFromOsvAffected(osvJson.affected)
+      : [];
+
+    affectedSourcesStatus.nvd.count = nvdAffected.length;
+    affectedSourcesStatus.cna.count = cnaAffected.length;
+    affectedSourcesStatus.cisa.count = cisaAffected.length;
+    affectedSourcesStatus.osv.count = osvAffected.length;
+
+    const affectedProducts = mergeAffectedProducts(
+      nvdAffected,
+      cnaAffected,
+      cisaAffected,
+      osvAffected
+    );
 
     // 5. Fallback to local inventory match if present
     let unreachableError: string | null = null;
@@ -4899,7 +4947,9 @@ app.get("/api/v1/cvss/resolve", async (req, res) => {
       attempted_sources: attemptedSources,
       published_date: publishedDate,
       cvss_v31: cvss31Data,
-      cvss_v40: cvss40Data
+      cvss_v40: cvss40Data,
+      affected_products: affectedProducts,
+      affected_sources_status: affectedSourcesStatus
     });
   } catch (err: any) {
     res.status(500).json({ error: "Failed to resolve CVSS vectors: " + err.message });
